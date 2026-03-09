@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CoinFlip Galaxy 🌌 V5.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+    --primary: #7c3aed;
+    --primary-light: #a78bfa;
+    --accent: #06d6a0;
+    --accent2: #f72585;
+    --gold: #fbbf24;
+    --bg: #0a0a14;
+    --bg2: #111128;
+    --card: #16163a;
+    --card2: #1e1e50;
+    --border: rgba(124,58,237,0.3);
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --danger: #ef4444;
+    --radius: 16px;
+    --flip-dur: 1.8s;
+    --coin-bg: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    --coin-border: #fde68a;
+    --coin-color: #fff;
+    --coin-emoji: '🪙';
+}
+
+* { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+
+body {
+    font-family: 'Exo 2', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image:
+        radial-gradient(ellipse at 20% 50%, rgba(124,58,237,0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(6,214,160,0.08) 0%, transparent 50%);
+}
+
+/* STARS BG */
+body::before {
+    content:'';
+    position:fixed; inset:0;
+    background-image:
+        radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 15% 85%, rgba(255,255,255,0.2) 0%, transparent 100%),
+        radial-gradient(1px 1px at 60% 30%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 80% 55%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 25% 40%, rgba(255,255,255,0.3) 0%, transparent 100%);
+    pointer-events:none; z-index:0;
+}
+
+/* HEADER */
+.header {
+    position:fixed; top:0; left:0; right:0; z-index:1000;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 20px;
+    background:rgba(10,10,20,0.85);
+    backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--border);
+}
+.logo {
+    font-family:'Orbitron',sans-serif;
+    font-weight:900; font-size:1rem;
+    background:linear-gradient(90deg, var(--primary-light), var(--accent));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    letter-spacing:1px;
+}
+.header-right { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.currency-badge {
+    background:linear-gradient(135deg, #fbbf24, #f59e0b);
+    color:#000; padding:6px 14px; border-radius:30px;
+    font-weight:800; font-size:0.85rem; font-family:'Orbitron',sans-serif;
+    box-shadow:0 0 15px rgba(251,191,36,0.4);
+    white-space:nowrap;
+}
+.streak-badge {
+    background:linear-gradient(135deg, #ef4444, #f97316);
+    color:#fff; padding:6px 12px; border-radius:30px;
+    font-weight:700; font-size:0.8rem;
+    display:none; animation:glow-red 1.5s infinite alternate;
+}
+@keyframes glow-red {
+    from { box-shadow:0 0 8px rgba(239,68,68,0.5); }
+    to { box-shadow:0 0 20px rgba(239,68,68,0.9); }
+}
+.icon-btn {
+    background:rgba(255,255,255,0.05); border:1px solid var(--border);
+    color:var(--text); width:38px; height:38px; border-radius:10px;
+    font-size:1.1rem; cursor:pointer; transition:all 0.2s;
+    display:flex; align-items:center; justify-content:center;
+}
+.icon-btn:hover { background:rgba(124,58,237,0.2); border-color:var(--primary); }
+
+/* MAIN */
+.main {
+    position:relative; z-index:1;
+    max-width:500px; margin:0 auto;
+    padding:80px 16px 120px;
+    display:flex; flex-direction:column; align-items:center;
+    gap:20px;
+}
+
+/* COIN ARENA */
+.coin-arena {
+    display:flex; flex-direction:column; align-items:center;
+    gap:16px; width:100%;
+    padding:30px 20px;
+    background:rgba(22,22,58,0.6);
+    border:1px solid var(--border);
+    border-radius:24px;
+    backdrop-filter:blur(10px);
+    position:relative; overflow:hidden;
+}
+.coin-arena::before {
+    content:'';
+    position:absolute; inset:0;
+    background:radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.1), transparent 70%);
+    pointer-events:none;
+}
+.coin-stage {
+    perspective:1200px;
+    width:160px; height:160px;
+    position:relative;
+    filter:drop-shadow(0 0 30px rgba(251,191,36,0.4));
+}
+#coin {
+    width:100%; height:100%;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:4.5rem;
+    background:var(--coin-bg);
+    border:6px solid var(--coin-border);
+    color:var(--coin-color);
+    cursor:pointer;
+    transition:background 0.3s, border-color 0.3s;
+    box-shadow:0 0 0 2px rgba(255,255,255,0.1), inset 0 2px 8px rgba(255,255,255,0.3);
+    user-select:none;
+}
+#coin:hover:not(.is-flipping) { transform:scale(1.05); }
+.is-flipping { animation:flip3d var(--flip-dur) cubic-bezier(0.175,0.885,0.32,1.275) forwards !important; }
+@keyframes flip3d {
+    0% { transform:rotateY(0) scale(1); }
+    30% { transform:rotateY(540deg) scale(1.3); }
+    70% { transform:rotateY(1260deg) scale(1.3); }
+    100% { transform:rotateY(1800deg) scale(1); }
+}
+@keyframes bounce-in {
+    0% { transform:scale(0.5); opacity:0; }
+    70% { transform:scale(1.1); opacity:1; }
+    100% { transform:scale(1); }
+}
+.coin-result-reveal { animation:bounce-in 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+
+#result-text {
+    font-family:'Orbitron',sans-serif;
+    font-size:1.4rem; font-weight:700;
+    color:var(--primary-light);
+    text-align:center; min-height:1.5em;
+    text-shadow:0 0 20px currentColor;
+    transition:color 0.3s;
+}
+.flip-message {
+    font-size:0.85rem; font-weight:600;
+    padding:6px 16px; border-radius:20px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.1);
+    color:var(--muted); min-height:2em;
+    text-align:center; transition:all 0.3s;
+}
+.flip-message.lucky { background:rgba(6,214,160,0.15); border-color:var(--accent); color:var(--accent); }
+.flip-message.streak { background:rgba(251,191,36,0.15); border-color:var(--gold); color:var(--gold); }
+
+/* CONTROLS */
+.controls-card {
+    width:100%;
+    background:rgba(22,22,58,0.6);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:20px;
+    backdrop-filter:blur(10px);
+}
+.btn-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
+.btn {
+    padding:14px 16px; border:none; border-radius:12px;
+    font-weight:700; font-size:0.95rem; cursor:pointer;
+    font-family:'Exo 2',sans-serif;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    transition:all 0.2s; position:relative; overflow:hidden;
+}
+.btn::after {
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(rgba(255,255,255,0.1), transparent);
+    pointer-events:none;
+}
+.btn-primary {
+    background:linear-gradient(135deg, var(--primary), #5b21b6);
+    color:#fff; box-shadow:0 4px 20px rgba(124,58,237,0.4);
+}
+.btn-primary:hover { box-shadow:0 6px 30px rgba(124,58,237,0.6); transform:translateY(-1px); }
+.btn-primary:active { transform:translateY(1px); }
+.btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+.btn-secondary {
+    background:rgba(255,255,255,0.05);
+    color:var(--text); border:1px solid var(--border);
+}
+.btn-secondary:hover { background:rgba(255,255,255,0.1); }
+.btn-danger {
+    background:linear-gradient(135deg, #ef4444, #dc2626);
+    color:#fff; box-shadow:0 4px 20px rgba(239,68,68,0.3);
+}
+.auto-row {
+    display:flex; gap:10px; align-items:center;
+}
+.select-box {
+    flex:1; padding:11px 14px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid var(--border);
+    border-radius:10px; color:var(--text);
+    font-family:'Exo 2',sans-serif; font-size:0.9rem;
+    cursor:pointer;
+}
+.select-box option { background:#111128; }
+
+/* STATS CARD */
+.stats-card {
+    width:100%;
+    background:rgba(22,22,58,0.6);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:20px;
+    backdrop-filter:blur(10px);
+}
+.card-title {
+    font-family:'Orbitron',sans-serif;
+    font-size:0.85rem; font-weight:700;
+    color:var(--primary-light);
+    margin-bottom:16px;
+    text-transform:uppercase; letter-spacing:1px;
+    display:flex; align-items:center; gap:8px;
+}
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:10px; }
+.stat-pill {
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:12px; padding:12px;
+    text-align:center; transition:all 0.2s;
+}
+.stat-pill:hover { border-color:var(--primary); background:rgba(124,58,237,0.1); }
+.stat-emoji { font-size:1.6rem; display:block; margin-bottom:4px; }
+.stat-name { font-size:0.75rem; color:var(--muted); }
+.stat-count { font-size:1.2rem; font-weight:700; color:var(--text); font-family:'Orbitron',sans-serif; }
+.stat-bar-wrapper { width:100%; height:4px; background:rgba(255,255,255,0.08); border-radius:2px; margin-top:6px; overflow:hidden; }
+.stat-bar { height:100%; border-radius:2px; transition:width 0.8s ease; }
+.totals-row {
+    display:flex; justify-content:space-between;
+    margin-top:14px; padding-top:14px;
+    border-top:1px solid rgba(255,255,255,0.06);
+    font-size:0.85rem; color:var(--muted);
+}
+.totals-row b { color:var(--text); }
+
+/* ACHIEVEMENTS */
+.ach-card {
+    width:100%;
+    background:rgba(22,22,58,0.6);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:20px;
+    backdrop-filter:blur(10px);
+}
+.ach-tabs {
+    display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;
+}
+.ach-tab {
+    padding:5px 12px; border-radius:20px; font-size:0.75rem;
+    font-weight:600; cursor:pointer; border:1px solid transparent;
+    background:rgba(255,255,255,0.05); color:var(--muted);
+    transition:all 0.2s;
+}
+.ach-tab.active { background:rgba(124,58,237,0.3); border-color:var(--primary); color:var(--primary-light); }
+.ach-grid {
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(48px,1fr));
+    gap:8px;
+}
+.ach-item {
+    aspect-ratio:1; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.4rem; cursor:pointer;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+    opacity:0.35; filter:grayscale(80%);
+    transition:all 0.2s; position:relative;
+}
+.ach-item.unlocked {
+    opacity:1; filter:none;
+    background:rgba(6,214,160,0.1);
+    border-color:var(--accent);
+    box-shadow:0 0 12px rgba(6,214,160,0.2);
+}
+.ach-item.skin-reward { box-shadow:0 0 15px rgba(167,139,250,0.4); border-color:var(--primary-light); }
+.ach-item:hover { transform:scale(1.15); z-index:5; }
+.ach-counter {
+    font-size:0.8rem; color:var(--muted); margin-top:10px;
+    display:flex; justify-content:space-between; align-items:center;
+}
+.ach-progress-bar {
+    flex:1; height:4px; background:rgba(255,255,255,0.06);
+    border-radius:2px; margin:0 10px; overflow:hidden;
+}
+.ach-progress-fill {
+    height:100%; background:linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius:2px; transition:width 0.8s ease;
+}
+
+/* MODALS */
+.modal-backdrop {
+    position:fixed; inset:0; z-index:2000;
+    background:rgba(0,0,0,0.7); backdrop-filter:blur(6px);
+    display:flex; align-items:flex-end; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity 0.3s;
+}
+.modal-backdrop.open { opacity:1; pointer-events:all; }
+.modal-sheet {
+    width:100%; max-width:520px;
+    background:var(--bg2);
+    border:1px solid var(--border);
+    border-radius:24px 24px 0 0;
+    padding:30px 24px;
+    transform:translateY(100%); transition:transform 0.35s cubic-bezier(0.2,0.8,0.2,1);
+    max-height:90vh; overflow-y:auto;
+}
+.modal-sheet::-webkit-scrollbar { width:4px; }
+.modal-sheet::-webkit-scrollbar-track { background:transparent; }
+.modal-sheet::-webkit-scrollbar-thumb { background:var(--primary); border-radius:2px; }
+.modal-backdrop.open .modal-sheet { transform:translateY(0); }
+.modal-title {
+    font-family:'Orbitron',sans-serif;
+    font-size:1.1rem; font-weight:700;
+    color:var(--primary-light); margin-bottom:20px;
+    display:flex; align-items:center; gap:10px;
+}
+.modal-close {
+    margin-left:auto; background:none; border:none;
+    color:var(--muted); font-size:1.4rem; cursor:pointer;
+}
+
+/* SHOP */
+.shop-section-title {
+    font-size:0.75rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:1px; color:var(--muted);
+    margin:20px 0 12px; padding-bottom:8px;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.upgrade-list { display:flex; flex-direction:column; gap:10px; }
+.upgrade-item {
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:14px; padding:16px;
+    display:flex; align-items:center; gap:14px;
+}
+.upgrade-icon { font-size:2rem; }
+.upgrade-info { flex:1; }
+.upgrade-name { font-weight:700; font-size:0.95rem; margin-bottom:3px; }
+.upgrade-desc { font-size:0.8rem; color:var(--muted); }
+.upgrade-level-bar {
+    display:flex; gap:4px; margin-top:8px;
+}
+.upgrade-pip {
+    height:4px; flex:1; border-radius:2px;
+    background:rgba(255,255,255,0.1);
+}
+.upgrade-pip.filled { background:var(--accent); }
+
+.skins-grid {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+    margin-top:8px;
+}
+.skin-item {
+    border-radius:14px; padding:14px 10px; text-align:center;
+    border:2px solid transparent;
+    cursor:pointer; transition:all 0.2s;
+    position:relative; overflow:hidden;
+}
+.skin-item:hover { transform:scale(1.03); }
+.skin-item.equipped { border-color:var(--accent); box-shadow:0 0 15px rgba(6,214,160,0.3); }
+.skin-item.locked { opacity:0.5; }
+.skin-emoji { font-size:2rem; display:block; margin-bottom:6px; }
+.skin-name { font-size:0.7rem; font-weight:700; }
+.skin-price { font-size:0.7rem; color:var(--gold); margin-top:3px; }
+.skin-badge {
+    position:absolute; top:5px; right:5px;
+    font-size:0.6rem; padding:2px 5px;
+    border-radius:6px; font-weight:700;
+}
+.skin-badge.achievement { background:rgba(167,139,250,0.3); color:var(--primary-light); }
+.skin-badge.owned { background:rgba(6,214,160,0.3); color:var(--accent); }
+
+/* MENU LIST */
+.menu-items { list-style:none; }
+.menu-item {
+    display:flex; align-items:center; gap:14px;
+    padding:15px 12px; border-radius:12px;
+    cursor:pointer; transition:all 0.2s;
+    font-weight:600; font-size:0.95rem;
+}
+.menu-item:hover { background:rgba(124,58,237,0.15); }
+.menu-item-icon { font-size:1.3rem; width:28px; text-align:center; }
+.menu-sep { height:1px; background:rgba(255,255,255,0.06); margin:8px 0; }
+
+/* ACH INFO */
+.ach-info-card {
+    background:rgba(22,22,58,0.9);
+    border:1px solid var(--border);
+    border-radius:20px; padding:28px; text-align:center;
+    width:100%; max-width:340px;
+    animation:bounce-in 0.3s ease;
+}
+.ach-big-icon { font-size:4rem; margin-bottom:12px; }
+.ach-info-title { font-family:'Orbitron',sans-serif; font-size:1rem; color:var(--primary-light); margin-bottom:8px; }
+.ach-info-desc { font-size:0.9rem; color:var(--muted); line-height:1.6; margin-bottom:14px; }
+.ach-info-reward {
+    background:rgba(251,191,36,0.15); border:1px solid rgba(251,191,36,0.3);
+    border-radius:12px; padding:10px 16px;
+    color:var(--gold); font-weight:700; font-size:0.9rem;
+}
+.ach-info-reward.completed { background:rgba(6,214,160,0.15); border-color:rgba(6,214,160,0.3); color:var(--accent); }
+
+#ach-info-modal { align-items:center; }
+#ach-info-modal .modal-sheet {
+    border-radius:20px; max-width:380px;
+    margin:0 16px; transform:scale(0.8);
+    transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+#ach-info-modal.open .modal-sheet { transform:scale(1); }
+
+/* CONFETTI */
+#confetti-canvas {
+    position:fixed; inset:0;
+    pointer-events:none; z-index:9999;
+    width:100%; height:100%;
+}
+
+/* TOAST */
+#toast-container {
+    position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+    z-index:3000; display:flex; flex-direction:column; gap:8px;
+    align-items:center; pointer-events:none;
+}
+.toast {
+    background:rgba(22,22,58,0.95);
+    border:1px solid var(--accent);
+    border-radius:30px; padding:10px 22px;
+    font-weight:700; font-size:0.9rem;
+    color:var(--text);
+    animation:toast-in 0.4s ease, toast-out 0.4s ease 2.5s forwards;
+    white-space:nowrap;
+    box-shadow:0 0 20px rgba(6,214,160,0.3);
+}
+@keyframes toast-in {
+    from { transform:translateY(20px); opacity:0; }
+    to { transform:translateY(0); opacity:1; }
+}
+@keyframes toast-out {
+    to { transform:translateY(-20px); opacity:0; }
+}
+
+/* ANALYST */
+.analyst-stat-row {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.05);
+    font-size:0.9rem;
+}
+.analyst-stat-row:last-child { border:none; }
+.analyst-stat-val { font-weight:700; color:var(--primary-light); }
+
+/* CUSTOM MODAL */
+.input-group { display:flex; gap:10px; align-items:center; margin-bottom:12px; }
+.input-text {
+    flex:1; padding:11px 14px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid var(--border);
+    border-radius:10px; color:var(--text);
+    font-family:'Exo 2',sans-serif; font-size:0.9rem;
+}
+.input-color { width:40px; height:40px; border:none; background:none; cursor:pointer; border-radius:8px; }
+.input-emoji-box { width:50px; text-align:center; font-size:1.2rem; }
+
+/* WEIGHTED */
+.weighted-error { color:var(--danger); font-size:0.85rem; min-height:1.5em; }
+.weighted-total { font-weight:700; font-size:0.95rem; }
+
+/* FOOTER */
+.version-footer {
+    position:fixed; bottom:8px; left:0; right:0;
+    text-align:center; font-size:0.7rem; color:rgba(255,255,255,0.15);
+    z-index:100; pointer-events:none;
+    font-family:'Orbitron',sans-serif;
+}
+
+/* NOTIFICATION BADGE */
+.notif-dot {
+    position:absolute; top:-3px; right:-3px;
+    width:10px; height:10px; border-radius:50%;
+    background:var(--accent2); border:2px solid var(--bg);
+}
+
+/* Mode indicator */
+.mode-badge {
+    font-size:0.75rem; padding:3px 10px; border-radius:20px;
+    background:rgba(124,58,237,0.2); border:1px solid rgba(124,58,237,0.4);
+    color:var(--primary-light); font-weight:600;
+    letter-spacing:0.5px;
+}
+
+/* Scrollbar global */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(124,58,237,0.5); border-radius:2px; }
+
+/* Lucky flash */
+@keyframes lucky-flash {
+    0%,100% { box-shadow:0 0 20px rgba(6,214,160,0); }
+    50% { box-shadow:0 0 50px rgba(6,214,160,0.7), 0 0 100px rgba(6,214,160,0.3); }
+}
+.lucky-flash { animation:lucky-flash 0.5s ease 3; }
+
+@keyframes record-pulse {
+    0%,100% { box-shadow:0 0 20px rgba(251,191,36,0); }
+    50% { box-shadow:0 0 50px rgba(251,191,36,0.7); }
+}
+.record-pulse { animation:record-pulse 0.4s ease 4; }
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+<div id="toast-container"></div>
+
+<!-- HEADER -->
+<header class="header">
+    <div class="logo">🌌 CoinFlip Galaxy</div>
+    <div class="header-right">
+        <div class="currency-badge" id="currency-display">💰 0</div>
+        <div class="streak-badge" id="streak-badge">🔥 0</div>
+        <button class="icon-btn" onclick="UI.openShop()" title="Mağaza">🛍️</button>
+        <button class="icon-btn" onclick="UI.openAnalyst()" title="Analiz">🧠</button>
+        <button class="icon-btn" onclick="UI.toggleMenu()" title="Menü">☰</button>
+    </div>
+</header>
+
+<!-- MAIN -->
+<div class="main">
+
+    <!-- COIN ARENA -->
+    <div class="coin-arena">
+        <div class="mode-badge" id="mode-display">Normal Mod</div>
+        <div class="coin-stage">
+            <div id="coin" onclick="G.logic.flip()">🪙</div>
+        </div>
+        <div id="result-text">Parayı at!</div>
+        <div class="flip-message" id="flip-message">Başlamak için parayı tıkla veya atış yap</div>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="controls-card">
+        <div class="btn-grid">
+            <button id="btn-flip" class="btn btn-primary" onclick="G.logic.flip()">
+                🎲 Parayı At
+            </button>
+            <button class="btn btn-secondary" onclick="G.logic.resetStats()">
+                🔄 Sıfırla
+            </button>
+        </div>
+        <div class="auto-row">
+            <select class="select-box" id="auto-limit">
+                <option value="10">10 Kez</option>
+                <option value="50">50 Kez</option>
+                <option value="100">100 Kez</option>
+                <option value="500">500 Kez</option>
+                <option value="1000">1.000 Kez</option>
+                <option value="5000">5.000 Kez</option>
+                <option value="10000">10.000 Kez</option>
+                <option value="999999">Sınırsız</option>
+            </select>
+            <button id="btn-auto" class="btn btn-secondary" style="white-space:nowrap;" onclick="G.logic.toggleAuto()">
+                🚀 Otomatik
+            </button>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-card">
+        <div class="card-title">📊 <span id="stats-mode-name">İstatistikler</span></div>
+        <div class="stats-grid" id="stats-container"></div>
+        <div class="totals-row">
+            <span>Toplam: <b id="total-flips">0</b></span>
+            <span>🔥 Rekor: <b id="best-streak">0</b></span>
+            <span>💰 Seri: <b id="cur-streak">0</b></span>
+        </div>
+    </div>
+
+    <!-- ACHIEVEMENTS -->
+    <div class="ach-card">
+        <div class="card-title">
+            🏆 Başarımlar
+            <span style="font-size:0.8rem; color:var(--muted); font-family:'Exo 2',sans-serif; font-weight:400;">
+                <span id="ach-unlocked-count">0</span> / <span id="ach-total-count">0</span>
+            </span>
+        </div>
+        <div class="ach-tabs" id="ach-tabs"></div>
+        <div class="ach-grid" id="ach-grid"></div>
+        <div class="ach-counter">
+            <span id="ach-cat-counter" style="font-size:0.8rem;"></span>
+            <div class="ach-progress-bar">
+                <div class="ach-progress-fill" id="ach-progress-fill" style="width:0%"></div>
+            </div>
+            <span id="ach-pct" style="font-size:0.8rem;"></span>
+        </div>
+    </div>
+
+</div>
+
+<div class="version-footer">V 5.0 — GALAXY EDITION</div>
+
+<!-- MAIN MENU MODAL -->
+<div id="menu-modal" class="modal-backdrop" onclick="if(event.target===this)UI.toggleMenu()">
+    <div class="modal-sheet">
+        <div class="modal-title">⚙️ Menü <button class="modal-close" onclick="UI.toggleMenu()">✕</button></div>
+        <ul class="menu-items">
+            <li class="menu-item" onclick="G.logic.setMode('NORMAL')"><span class="menu-item-icon">🎯</span> Normal (Yazı/Tura)</li>
+            <li class="menu-item" onclick="UI.openWeighted()"><span class="menu-item-icon">⚖️</span> Ağırlıklı Mod</li>
+            <li class="menu-item" onclick="G.logic.setMode('RPS')"><span class="menu-item-icon">✊</span> Taş-Kağıt-Makas</li>
+            <li class="menu-item" onclick="G.logic.setMode('SIMPLE')"><span class="menu-item-icon">❓</span> Basit (Evet/Hayır)</li>
+            <li class="menu-item" onclick="G.logic.setMode('DICE')"><span class="menu-item-icon">🎲</span> Zar (1-6)</li>
+            <li class="menu-item" onclick="G.logic.setMode('DICE20')"><span class="menu-item-icon">🎯</span> D20 Zar (1-20)</li>
+            <li class="menu-item" onclick="G.logic.setMode('CARD')"><span class="menu-item-icon">🃏</span> Kart Çek (As-Papaz)</li>
+            <li class="menu-item" onclick="G.logic.setMode('ELEMENT')"><span class="menu-item-icon">🔥</span> 4 Element Modu</li>
+            <li class="menu-item" onclick="G.logic.setMode('PLANET')"><span class="menu-item-icon">🪐</span> Gezegen Modu</li>
+            <li class="menu-item" onclick="G.logic.setMode('CATEGORY')"><span class="menu-item-icon">📚</span> 12 Kategori</li>
+            <li class="menu-item" onclick="UI.openCustom()"><span class="menu-item-icon">✏️</span> Özel Mod Oluştur</li>
+            <div class="menu-sep"></div>
+            <li class="menu-item" onclick="UI.toggleDark()"><span class="menu-item-icon">🌓</span> Karanlık/Aydınlık</li>
+            <li class="menu-item" onclick="G.data.export()"><span class="menu-item-icon">💾</span> Veriyi Dışa Aktar</li>
+            <li class="menu-item" onclick="document.getElementById('import-file').click()"><span class="menu-item-icon">📂</span> Veriyi İçe Aktar</li>
+            <input type="file" id="import-file" style="display:none" onchange="G.data.import(this)">
+            <div class="menu-sep"></div>
+        </ul>
+        <button class="btn btn-danger" style="width:100%; margin-top:8px;" onclick="G.logic.hardReset()">🚨 Sıfırla (Hard Reset)</button>
+        <button class="btn btn-secondary" style="width:100%; margin-top:8px;" onclick="UI.toggleMenu()">Kapat</button>
+    </div>
+</div>
+
+<!-- SHOP MODAL -->
+<div id="shop-modal" class="modal-backdrop" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="modal-sheet">
+        <div class="modal-title">🛍️ Mağaza <button class="modal-close" onclick="document.getElementById('shop-modal').classList.remove('open')">✕</button></div>
+        <p style="font-weight:800; font-size:1rem; color:var(--gold);" id="shop-currency">💰 0 Jeton</p>
+        <div class="shop-section-title">⚡ Kalıcı Yükseltmeler</div>
+        <div class="upgrade-list" id="upgrade-list"></div>
+        <div class="shop-section-title">🎨 Kozmetik Ürünler</div>
+        <p style="font-size:0.75rem; color:var(--muted); margin-bottom:10px;">🔒 ile gösterilenler başarım ile açılır</p>
+        <div class="skins-grid" id="skins-grid"></div>
+        <button class="btn btn-secondary" style="width:100%; margin-top:20px;" onclick="document.getElementById('shop-modal').classList.remove('open')">Kapat</button>
+    </div>
+</div>
+
+<!-- ANALYST MODAL -->
+<div id="analyst-modal" class="modal-backdrop" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="modal-sheet">
+        <div class="modal-title">🧠 Analiz Merkezi <button class="modal-close" onclick="document.getElementById('analyst-modal').classList.remove('open')">✕</button></div>
+        <div id="analyst-content"></div>
+        <button class="btn btn-secondary" style="width:100%; margin-top:16px;" onclick="document.getElementById('analyst-modal').classList.remove('open')">Kapat</button>
+    </div>
+</div>
+
+<!-- ACH INFO MODAL -->
+<div id="ach-info-modal" class="modal-backdrop" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="modal-sheet">
+        <div class="ach-info-card" id="ach-info-content"></div>
+        <button class="btn btn-primary" style="width:100%; margin-top:12px;" onclick="document.getElementById('ach-info-modal').classList.remove('open')">Tamam</button>
+    </div>
+</div>
+
+<!-- WEIGHTED MODAL -->
+<div id="weighted-modal" class="modal-backdrop" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="modal-sheet">
+        <div class="modal-title">⚖️ Ağırlıklı Mod <button class="modal-close" onclick="document.getElementById('weighted-modal').classList.remove('open')">✕</button></div>
+        <p style="font-size:0.85rem; color:var(--muted); margin-bottom:16px;">Her sonucun ağırlığını belirleyin. Toplam %100 olmalı.</p>
+        <div id="weighted-inputs"></div>
+        <div class="weighted-total" style="margin-top:10px;">Toplam: <span id="weighted-total-val">0%</span></div>
+        <div class="weighted-error" id="weighted-error"></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px;">
+            <button class="btn btn-primary" onclick="G.logic.saveWeighted()">Başlat</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('weighted-modal').classList.remove('open')">İptal</button>
+        </div>
+    </div>
+</div>
+
+<!-- CUSTOM MODAL -->
+<div id="custom-modal" class="modal-backdrop" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="modal-sheet">
+        <div class="modal-title">✏️ Özel Mod <button class="modal-close" onclick="document.getElementById('custom-modal').classList.remove('open')">✕</button></div>
+        <p style="font-size:0.85rem; color:var(--muted); margin-bottom:16px;">Min 2, Maks 6 sonuç. Her sonuç eşit olasılıklıdır.</p>
+        <div id="custom-inputs"></div>
+        <button class="btn btn-secondary" style="width:100%; margin:10px 0;" onclick="UI.addCustomInput()">+ Ekle</button>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <button class="btn btn-primary" onclick="G.logic.saveCustom()">Kaydet & Başlat</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('custom-modal').classList.remove('open')">İptal</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// =====================================================
+// COINFLIP GALAXY V5.0 — GAME ENGINE
+// =====================================================
+
+const G = {
+    state: {
+        mode: 'NORMAL',
+        outcomes: [],
+        total: 0,
+        streak: 0,
+        bestStreak: 0,
+        lastId: null,
+        isAuto: false,
+        autoLimit: 0,
+        autoCount: 0,
+        unlockedAchievements: [],
+        weightedConfig: [],
+        customOutcomes: [],
+        currency: 150,
+        inventory: ['default'],
+        activeSkin: 'default',
+        // Upgrade levels
+        bonusLevel: 1,
+        speedLevel: 1,
+        luckyLevel: 1,
+        autoSpeedLevel: 1,
+        // Long-term stats
+        ls: {
+            earned: 0,
+            wins: 0,
+            losses: 0,
+            luckyWins: 0,
+            flips: 0,
+            modes: {},
+            sessions: 0,
+            longestSession: 0,
+            maxStreak: 0,
+            totalCurrency: 0,
+        }
+    },
+
+    defaults: {
+        NORMAL: [
+            { id:'n1', name:'Yazı', emoji:'✍️', color:'#ef4444', count:0, weight:50 },
+            { id:'n2', name:'Tura', emoji:'👑', color:'#06d6a0', count:0, weight:50 }
+        ],
+        SIMPLE: [
+            { id:'s1', name:'Evet', emoji:'✅', color:'#22c55e', count:0, weight:50 },
+            { id:'s2', name:'Hayır', emoji:'❌', color:'#ef4444', count:0, weight:50 }
+        ],
+        DICE: [
+            { id:'d1', name:'1', emoji:'⚀', color:'#3b82f6', count:0, weight:16.67 },
+            { id:'d2', name:'2', emoji:'⚁', color:'#6366f1', count:0, weight:16.67 },
+            { id:'d3', name:'3', emoji:'⚂', color:'#8b5cf6', count:0, weight:16.67 },
+            { id:'d4', name:'4', emoji:'⚃', color:'#a855f7', count:0, weight:16.67 },
+            { id:'d5', name:'5', emoji:'⚄', color:'#ec4899', count:0, weight:16.67 },
+            { id:'d6', name:'6', emoji:'⚅', color:'#f43f5e', count:0, weight:16.67 }
+        ],
+        DICE20: [
+            { id:'d20_1', name:'1', emoji:'💀', color:'#ef4444', count:0, weight:5 },
+            { id:'d20_2', name:'2', emoji:'2️⃣', color:'#f97316', count:0, weight:5 },
+            { id:'d20_3', name:'3', emoji:'3️⃣', color:'#f59e0b', count:0, weight:5 },
+            { id:'d20_4', name:'4', emoji:'4️⃣', color:'#84cc16', count:0, weight:5 },
+            { id:'d20_5', name:'5', emoji:'5️⃣', color:'#22c55e', count:0, weight:5 },
+            { id:'d20_6', name:'6', emoji:'6️⃣', color:'#10b981', count:0, weight:5 },
+            { id:'d20_7', name:'7', emoji:'7️⃣', color:'#06b6d4', count:0, weight:5 },
+            { id:'d20_8', name:'8', emoji:'8️⃣', color:'#3b82f6', count:0, weight:5 },
+            { id:'d20_9', name:'9', emoji:'9️⃣', color:'#6366f1', count:0, weight:5 },
+            { id:'d20_10', name:'10', emoji:'🔟', color:'#8b5cf6', count:0, weight:5 },
+            { id:'d20_11', name:'11', emoji:'1️⃣1️⃣', color:'#a855f7', count:0, weight:5 },
+            { id:'d20_12', name:'12', emoji:'✨', color:'#ec4899', count:0, weight:5 },
+            { id:'d20_13', name:'13', emoji:'🎭', color:'#f43f5e', count:0, weight:5 },
+            { id:'d20_14', name:'14', emoji:'⚡', color:'#fbbf24', count:0, weight:5 },
+            { id:'d20_15', name:'15', emoji:'🔥', color:'#f97316', count:0, weight:5 },
+            { id:'d20_16', name:'16', emoji:'💎', color:'#06d6a0', count:0, weight:5 },
+            { id:'d20_17', name:'17', emoji:'🌟', color:'#f1c40f', count:0, weight:5 },
+            { id:'d20_18', name:'18', emoji:'👑', color:'#daa520', count:0, weight:5 },
+            { id:'d20_19', name:'19', emoji:'🏆', color:'#c084fc', count:0, weight:5 },
+            { id:'d20_20', name:'20', emoji:'💥', color:'#4ade80', count:0, weight:5 }
+        ],
+        RPS: [
+            { id:'r1', name:'Taş', emoji:'✊', color:'#94a3b8', count:0, weight:33.33 },
+            { id:'r2', name:'Kağıt', emoji:'✋', color:'#fbbf24', count:0, weight:33.33 },
+            { id:'r3', name:'Makas', emoji:'✌️', color:'#60a5fa', count:0, weight:33.33 }
+        ],
+        CARD: [
+            { id:'c1', name:'As', emoji:'🅰️', color:'#ef4444', count:0, weight:12.5 },
+            { id:'c2', name:'2-5', emoji:'🃏', color:'#f97316', count:0, weight:25 },
+            { id:'c3', name:'6-9', emoji:'♠️', color:'#8b5cf6', count:0, weight:25 },
+            { id:'c4', name:'10', emoji:'🔟', color:'#06d6a0', count:0, weight:12.5 },
+            { id:'c5', name:'Vale', emoji:'🤴', color:'#3b82f6', count:0, weight:12.5 },
+            { id:'c6', name:'Kız', emoji:'👸', color:'#ec4899', count:0, weight:6.25 },
+            { id:'c7', name:'Papaz', emoji:'🤵', color:'#daa520', count:0, weight:6.25 }
+        ],
+        ELEMENT: [
+            { id:'el1', name:'Ateş', emoji:'🔥', color:'#ef4444', count:0, weight:25 },
+            { id:'el2', name:'Su', emoji:'💧', color:'#3b82f6', count:0, weight:25 },
+            { id:'el3', name:'Toprak', emoji:'🌍', color:'#84cc16', count:0, weight:25 },
+            { id:'el4', name:'Hava', emoji:'💨', color:'#06b6d4', count:0, weight:25 }
+        ],
+        PLANET: [
+            { id:'p1', name:'Merkür', emoji:'☿️', color:'#94a3b8', count:0, weight:12.5 },
+            { id:'p2', name:'Venüs', emoji:'♀️', color:'#fbbf24', count:0, weight:12.5 },
+            { id:'p3', name:'Dünya', emoji:'🌍', color:'#22c55e', count:0, weight:12.5 },
+            { id:'p4', name:'Mars', emoji:'♂️', color:'#ef4444', count:0, weight:12.5 },
+            { id:'p5', name:'Jüpiter', emoji:'🪐', color:'#f97316', count:0, weight:12.5 },
+            { id:'p6', name:'Satürn', emoji:'🪐', color:'#daa520', count:0, weight:12.5 },
+            { id:'p7', name:'Uranüs', emoji:'🔵', color:'#06b6d4', count:0, weight:12.5 },
+            { id:'p8', name:'Neptün', emoji:'🫧', color:'#6366f1', count:0, weight:12.5 }
+        ],
+        CATEGORY: [
+            { id:'cat1', name:'Hayvan', emoji:'🐾', color:'#f9ca24', count:0, weight:8.33 },
+            { id:'cat2', name:'Meyve', emoji:'🍎', color:'#eb4d4b', count:0, weight:8.33 },
+            { id:'cat3', name:'Taşıt', emoji:'🚗', color:'#0fbcf9', count:0, weight:8.33 },
+            { id:'cat4', name:'Spor', emoji:'⚽', color:'#1dd1a1', count:0, weight:8.33 },
+            { id:'cat5', name:'Renk', emoji:'🌈', color:'#9d32d7', count:0, weight:8.33 },
+            { id:'cat6', name:'Ülke', emoji:'🗺️', color:'#f78c00', count:0, weight:8.33 },
+            { id:'cat7', name:'Hava', emoji:'☁️', color:'#54a0ff', count:0, weight:8.33 },
+            { id:'cat8', name:'Gezegen', emoji:'🪐', color:'#9c88ff', count:0, weight:8.33 },
+            { id:'cat9', name:'Müzik', emoji:'🎶', color:'#ff6b81', count:0, weight:8.33 },
+            { id:'cat10', name:'Yemek', emoji:'🍔', color:'#2ecc71', count:0, weight:8.33 },
+            { id:'cat11', name:'Şans', emoji:'🍀', color:'#38ada9', count:0, weight:8.33 },
+            { id:'cat12', name:'Bilim', emoji:'🔬', color:'#a29bfe', count:0, weight:8.33 }
+        ],
+        CUSTOM: []
+    },
+
+    upgrades: {
+        bonus: {
+            name:'💰 Jeton Çarpanı',
+            desc: l => `Atış başına x${l} jeton`,
+            maxLevel: 15,
+            baseCost: 50,
+            costMul: 1.5,
+            effect: l => l,
+        },
+        speed: {
+            name:'⚡ Atış Hızı',
+            desc: l => `Dönüş süresi: ${[2,1.5,1.2,1.0,0.8,0.6][Math.min(l-1,5)]}s`,
+            maxLevel: 6,
+            baseCost: 100,
+            costMul: 2.2,
+            effect: l => [2,1.5,1.2,1.0,0.8,0.6][Math.min(l-1,5)],
+        },
+        lucky: {
+            name:'🍀 Şans Etkinliği',
+            desc: l => `Şans ödülü: +${10 + l*15} jeton`,
+            maxLevel: 12,
+            baseCost: 200,
+            costMul: 1.8,
+            effect: l => 10 + l * 15,
+        },
+        autoSpeed: {
+            name:'🤖 Oto Hız',
+            desc: l => `Oto atış gecikmesi: ${Math.max(50, 300 - l*50)}ms`,
+            maxLevel: 5,
+            baseCost: 500,
+            costMul: 2.5,
+            effect: l => Math.max(50, 300 - l*50),
+        }
+    },
+
+    // 100+ SKINS
+    skins: [
+        // FREE / DEFAULT
+        { id:'default', name:'Klasik Altın', emoji:'🪙', bg:'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)', border:'#fde68a', color:'#fff', price:0, type:'free', theme:null },
+        // ACHIEVEMENT SKINS
+        { id:'streak5', name:'Seri Başlangıcı', emoji:'🔥', bg:'linear-gradient(135deg,#f97316,#ef4444)', border:'#fca5a5', color:'#fff', price:0, type:'achievement', lockedBy:'ach_streak5', theme:null },
+        { id:'lucky_charm', name:'Şans Tılsımı', emoji:'🍀', bg:'linear-gradient(135deg,#22c55e,#16a34a)', border:'#86efac', color:'#fff', price:0, type:'achievement', lockedBy:'ach_lucky50', theme:null },
+        { id:'streak_lord', name:'Seri Lordu', emoji:'🔱', bg:'linear-gradient(135deg,#f59e0b,#b45309)', border:'#fde68a', color:'#fff', price:0, type:'achievement', lockedBy:'ach_streak25', theme:null },
+        { id:'century', name:'Asırlık', emoji:'💯', bg:'linear-gradient(135deg,#3b82f6,#1d4ed8)', border:'#93c5fd', color:'#fff', price:0, type:'achievement', lockedBy:'ach_century', theme:null },
+        { id:'richer', name:'Jeton Milyoneri', emoji:'💎', bg:'linear-gradient(135deg,#a855f7,#7c3aed)', border:'#d8b4fe', color:'#fff', price:0, type:'achievement', lockedBy:'ach_millionaire', theme:null },
+        { id:'galaxy_master', name:'Galaksi Ustası', emoji:'🌌', bg:'linear-gradient(135deg,#1e1b4b,#312e81)', border:'#818cf8', color:'#c7d2fe', price:0, type:'achievement', lockedBy:'ach_absolute_master', theme:{bg:'radial-gradient(ellipse at center, #0f0c29, #302b63, #24243e)'} },
+        { id:'all_modes', name:'Mod Gezgini', emoji:'🧭', bg:'linear-gradient(135deg,#0ea5e9,#0284c7)', border:'#7dd3fc', color:'#fff', price:0, type:'achievement', lockedBy:'ach_all_modes', theme:null },
+        { id:'cosmos', name:'Kozmik Ruh', emoji:'🌠', bg:'linear-gradient(135deg,#ec4899,#7c3aed)', border:'#f9a8d4', color:'#fff', price:0, type:'achievement', lockedBy:'ach_10k_flips', theme:null },
+        { id:'neon_god', name:'Neon Tanrısı', emoji:'⚡', bg:'linear-gradient(135deg,#06d6a0,#0891b2)', border:'#6ee7b7', color:'#000', price:0, type:'achievement', lockedBy:'ach_all_upgrades_max', theme:{bg:'linear-gradient(135deg, #001a0e, #003320)'} },
+        // SHOP SKINS — Bronze tier
+        { id:'wood', name:'Tahta', emoji:'🪵', bg:'linear-gradient(135deg,#92400e,#78350f)', border:'#d97706', color:'#fde68a', price:75, type:'shop', theme:null },
+        { id:'stone', name:'Taş', emoji:'🪨', bg:'linear-gradient(135deg,#6b7280,#374151)', border:'#9ca3af', color:'#f3f4f6', price:100, type:'shop', theme:null },
+        { id:'copper', name:'Bakır', emoji:'🟤', bg:'linear-gradient(135deg,#c2410c,#9a3412)', border:'#fb923c', color:'#fff', price:150, type:'shop', theme:null },
+        { id:'clay', name:'Kil', emoji:'🏺', bg:'linear-gradient(135deg,#dc6803,#b45309)', border:'#fde68a', color:'#fff', price:200, type:'shop', theme:null },
+        { id:'leaf', name:'Yaprak', emoji:'🍃', bg:'linear-gradient(135deg,#15803d,#14532d)', border:'#86efac', color:'#dcfce7', price:250, type:'shop', theme:null },
+        { id:'sand', name:'Kum', emoji:'🏖️', bg:'linear-gradient(135deg,#ca8a04,#a16207)', border:'#fde047', color:'#fff', price:300, type:'shop', theme:null },
+        { id:'cherry', name:'Kiraz', emoji:'🍒', bg:'linear-gradient(135deg,#be123c,#9f1239)', border:'#fca5a5', color:'#fff', price:350, type:'shop', theme:null },
+        { id:'mint', name:'Nane', emoji:'🌿', bg:'linear-gradient(135deg,#059669,#047857)', border:'#6ee7b7', color:'#fff', price:400, type:'shop', theme:null },
+        { id:'lavender', name:'Lavanta', emoji:'💜', bg:'linear-gradient(135deg,#7c3aed,#6d28d9)', border:'#c4b5fd', color:'#fff', price:450, type:'shop', theme:null },
+        { id:'bubblegum', name:'Sakız', emoji:'🩷', bg:'linear-gradient(135deg,#db2777,#be185d)', border:'#f9a8d4', color:'#fff', price:500, type:'shop', theme:null },
+        // Silver tier
+        { id:'gold', name:'Altın', emoji:'🏆', bg:'linear-gradient(135deg,#fbbf24,#b45309)', border:'#fde68a', color:'#fff', price:750, type:'shop', theme:null },
+        { id:'silver_coin', name:'Gümüş', emoji:'🥈', bg:'linear-gradient(135deg,#94a3b8,#64748b)', border:'#cbd5e1', color:'#fff', price:800, type:'shop', theme:null },
+        { id:'ruby', name:'Yakut', emoji:'♦️', bg:'linear-gradient(135deg,#dc2626,#991b1b)', border:'#fca5a5', color:'#fff', price:1000, type:'shop', theme:null },
+        { id:'sapphire', name:'Safir', emoji:'💎', bg:'linear-gradient(135deg,#1d4ed8,#1e3a8a)', border:'#93c5fd', color:'#fff', price:1200, type:'shop', theme:null },
+        { id:'emerald', name:'Zümrüt', emoji:'💚', bg:'linear-gradient(135deg,#15803d,#065f46)', border:'#6ee7b7', color:'#fff', price:1500, type:'shop', theme:null },
+        { id:'amethyst', name:'Ametist', emoji:'🔮', bg:'linear-gradient(135deg,#7c3aed,#4c1d95)', border:'#c4b5fd', color:'#fff', price:1800, type:'shop', theme:null },
+        { id:'topaz', name:'Topaz', emoji:'🟡', bg:'linear-gradient(135deg,#d97706,#92400e)', border:'#fde68a', color:'#fff', price:2000, type:'shop', theme:null },
+        { id:'opal', name:'Opal', emoji:'🌈', bg:'linear-gradient(135deg, #f43f5e, #a855f7, #3b82f6)', border:'#f9a8d4', color:'#fff', price:2500, type:'shop', theme:null },
+        { id:'onyx', name:'Oniks', emoji:'⬛', bg:'linear-gradient(135deg,#111827,#1f2937)', border:'#4b5563', color:'#9ca3af', price:2800, type:'shop', theme:null },
+        { id:'pearl', name:'İnci', emoji:'🤍', bg:'linear-gradient(135deg,#f1f5f9,#e2e8f0)', border:'#ffffff', color:'#334155', price:3000, type:'shop', theme:null },
+        // Gold tier
+        { id:'fire', name:'Ateş Topu', emoji:'🔥', bg:'linear-gradient(135deg,#ef4444,#f97316)', border:'#fca5a5', color:'#fff', price:4000, type:'shop', theme:null },
+        { id:'ice', name:'Buz', emoji:'🧊', bg:'linear-gradient(135deg,#bae6fd,#7dd3fc)', border:'#e0f2fe', color:'#0c4a6e', price:4500, type:'shop', theme:null },
+        { id:'lava', name:'Lav', emoji:'🌋', bg:'linear-gradient(135deg,#9a3412,#1c1917)', border:'#f97316', color:'#fed7aa', price:5000, type:'shop', theme:null },
+        { id:'ocean', name:'Okyanus', emoji:'🌊', bg:'linear-gradient(135deg,#0891b2,#0e7490)', border:'#67e8f9', color:'#fff', price:5500, type:'shop', theme:null },
+        { id:'forest', name:'Orman', emoji:'🌲', bg:'linear-gradient(135deg,#14532d,#052e16)', border:'#4ade80', color:'#dcfce7', price:6000, type:'shop', theme:null },
+        { id:'desert', name:'Çöl', emoji:'🏜️', bg:'linear-gradient(135deg,#ca8a04,#451a03)', border:'#fde047', color:'#fef9c3', price:6500, type:'shop', theme:null },
+        { id:'storm', name:'Fırtına', emoji:'⛈️', bg:'linear-gradient(135deg,#475569,#1e3a5f)', border:'#93c5fd', color:'#bfdbfe', price:7000, type:'shop', theme:null },
+        { id:'aurora', name:'Kuzey Işığı', emoji:'🌌', bg:'linear-gradient(135deg,#22d3ee,#4ade80,#a855f7)', border:'#6ee7b7', color:'#fff', price:8000, type:'shop', theme:null },
+        { id:'volcano', name:'Volkan', emoji:'🌋', bg:'linear-gradient(135deg,#7f1d1d,#b91c1c)', border:'#ef4444', color:'#fca5a5', price:8500, type:'shop', theme:null },
+        { id:'tundra', name:'Tundra', emoji:'❄️', bg:'linear-gradient(135deg,#e0f2fe,#bae6fd)', border:'#fff', color:'#0369a1', price:9000, type:'shop', theme:null },
+        // Platinum tier
+        { id:'space', name:'Uzay Kaya', emoji:'🌑', bg:'linear-gradient(135deg,#0f172a,#1e293b)', border:'#334155', color:'#94a3b8', price:10000, type:'shop', theme:null },
+        { id:'nebula', name:'Nebula', emoji:'🌌', bg:'linear-gradient(135deg,#312e81,#4c1d95,#1e3a8a)', border:'#818cf8', color:'#c7d2fe', price:12000, type:'shop', theme:null },
+        { id:'matrix', name:'Matrix', emoji:'💚', bg:'linear-gradient(135deg,#052e16,#14532d)', border:'#4ade80', color:'#4ade80', price:14000, type:'shop', theme:{bg:'linear-gradient(135deg, #001a0e, #003320)'} },
+        { id:'neon', name:'Neon', emoji:'💡', bg:'linear-gradient(135deg,#0891b2,#22d3ee)', border:'#67e8f9', color:'#000', price:15000, type:'shop', theme:null },
+        { id:'cyberpunk', name:'Siber Punk', emoji:'🤖', bg:'linear-gradient(135deg,#db2777,#06b6d4)', border:'#f0abfc', color:'#fff', price:16000, type:'shop', theme:{bg:'linear-gradient(135deg, #1a001a, #001a1a)'} },
+        { id:'phantom', name:'Hayalet', emoji:'👻', bg:'linear-gradient(135deg, rgba(255,255,255,0.15), rgba(200,200,255,0.1))', border:'rgba(255,255,255,0.4)', color:'#fff', price:18000, type:'shop', theme:null },
+        { id:'void', name:'Void', emoji:'🕳️', bg:'linear-gradient(135deg,#000000,#0a0010)', border:'#3b0764', color:'#7c3aed', price:20000, type:'shop', theme:null },
+        { id:'angel', name:'Melek', emoji:'😇', bg:'linear-gradient(135deg,#fef9c3,#fde68a)', border:'#ffffff', color:'#92400e', price:22000, type:'shop', theme:null },
+        { id:'demon', name:'Şeytan', emoji:'😈', bg:'linear-gradient(135deg,#7f1d1d,#450a0a)', border:'#ef4444', color:'#fca5a5', price:24000, type:'shop', theme:null },
+        { id:'robot', name:'Robot', emoji:'🤖', bg:'linear-gradient(135deg,#374151,#111827)', border:'#6ee7b7', color:'#6ee7b7', price:26000, type:'shop', theme:null },
+        // Diamond tier
+        { id:'rainbow', name:'Gökkuşağı', emoji:'🌈', bg:'linear-gradient(to right, #ef4444, #f97316, #fbbf24, #22c55e, #3b82f6, #8b5cf6)', border:'#fff', color:'#fff', price:30000, type:'shop', theme:null },
+        { id:'diamond_skin', name:'Elmas', emoji:'💎', bg:'linear-gradient(135deg,#bae6fd,#ffffff,#bfdbfe)', border:'#ffffff', color:'#1d4ed8', price:35000, type:'shop', theme:null },
+        { id:'prismatic', name:'Prizmatik', emoji:'✨', bg:'linear-gradient(45deg, #ef4444, #ec4899, #8b5cf6, #3b82f6, #06b6d4, #22c55e)', border:'#fff', color:'#fff', price:40000, type:'shop', theme:null },
+        { id:'hologram', name:'Hologram', emoji:'📱', bg:'linear-gradient(135deg,rgba(6,214,160,0.3),rgba(124,58,237,0.3))', border:'rgba(255,255,255,0.5)', color:'#fff', price:45000, type:'shop', theme:null },
+        { id:'galaxy', name:'Galaksi', emoji:'🌌', bg:'linear-gradient(135deg,#1e1b4b,#4c1d95,#312e81)', border:'#818cf8', color:'#c7d2fe', price:50000, type:'shop', theme:{bg:'radial-gradient(ellipse at top, #1e1b4b, #0f0a2e)'} },
+        { id:'supernova', name:'Süpernova', emoji:'💫', bg:'linear-gradient(135deg,#7f1d1d,#fbbf24,#fff)', border:'#fde68a', color:'#fff', price:60000, type:'shop', theme:null },
+        { id:'blackhole', name:'Kara Delik', emoji:'🕳️', bg:'radial-gradient(circle, #000 30%, #1a0033 70%, #000)', border:'#7c3aed', color:'#c4b5fd', price:75000, type:'shop', theme:{bg:'radial-gradient(ellipse at center, #0a000f, #000)'} },
+        { id:'universe', name:'Evren', emoji:'🌐', bg:'linear-gradient(135deg,#06d6a0,#0891b2,#6366f1,#ec4899)', border:'#c4b5fd', color:'#fff', price:100000, type:'shop', theme:{bg:'radial-gradient(ellipse, #050520, #000'} },
+        // SPECIAL — only for some achievements (if available freely, listed too)
+        { id:'dark_matter', name:'Karanlık Madde', emoji:'🌑', bg:'linear-gradient(135deg,#000,#1a0a2e)', border:'#4c1d95', color:'#a855f7', price:250000, type:'shop', theme:{bg:'#000000'} },
+        { id:'eternal', name:'Sonsuzluk', emoji:'♾️', bg:'linear-gradient(to right, #fbbf24, #f9a8d4, #818cf8, #6ee7b7, #fbbf24)', border:'#fff', color:'#fff', price:500000, type:'shop', theme:null },
+        // Seasonal / themed
+        { id:'halloween', name:'Cadılar Bayramı', emoji:'🎃', bg:'linear-gradient(135deg,#7c2d12,#431407)', border:'#f97316', color:'#fed7aa', price:3500, type:'shop', theme:null },
+        { id:'christmas', name:'Yılbaşı', emoji:'🎄', bg:'linear-gradient(135deg,#14532d,#7f1d1d)', border:'#4ade80', color:'#fde68a', price:3500, type:'shop', theme:null },
+        { id:'valentines', name:'Sevgililer Günü', emoji:'❤️', bg:'linear-gradient(135deg,#be185d,#9f1239)', border:'#f9a8d4', color:'#fff', price:3500, type:'shop', theme:null },
+        { id:'ocean_deep', name:'Derin Deniz', emoji:'🐋', bg:'linear-gradient(135deg,#1e3a5f,#0c4a6e)', border:'#38bdf8', color:'#bae6fd', price:12000, type:'shop', theme:{bg:'linear-gradient(135deg, #020c14, #0c1a26)'} },
+        { id:'sunset', name:'Gün Batımı', emoji:'🌅', bg:'linear-gradient(135deg,#ef4444,#f97316,#fbbf24)', border:'#fde68a', color:'#fff', price:7500, type:'shop', theme:null },
+        { id:'midnight', name:'Gece Yarısı', emoji:'🌙', bg:'linear-gradient(135deg,#0f172a,#1e3a8a)', border:'#93c5fd', color:'#bfdbfe', price:9000, type:'shop', theme:{bg:'linear-gradient(135deg, #020617, #0f172a)'} },
+        { id:'dawn', name:'Şafak', emoji:'🌄', bg:'linear-gradient(135deg,#fbbf24,#f9a8d4,#bfdbfe)', border:'#fff', color:'#7c3aed', price:8000, type:'shop', theme:null },
+        { id:'crystal', name:'Kristal', emoji:'🔷', bg:'linear-gradient(135deg,#e0f2fe,#bae6fd,#f0f9ff)', border:'#fff', color:'#0369a1', price:11000, type:'shop', theme:null },
+        { id:'magma', name:'Magma', emoji:'🌡️', bg:'linear-gradient(135deg,#9a3412,#7c2d12)', border:'#f97316', color:'#fed7aa', price:13000, type:'shop', theme:{bg:'linear-gradient(135deg, #1a0500, #2d0a00)'} },
+        { id:'arctic', name:'Arktik', emoji:'🐧', bg:'linear-gradient(135deg,#e0f2fe,#7dd3fc)', border:'#fff', color:'#0c4a6e', price:10500, type:'shop', theme:null },
+        { id:'coral', name:'Mercan', emoji:'🪸', bg:'linear-gradient(135deg,#f43f5e,#fb923c)', border:'#fca5a5', color:'#fff', price:6500, type:'shop', theme:null },
+        { id:'sakura', name:'Sakura', emoji:'🌸', bg:'linear-gradient(135deg,#f9a8d4,#fce7f3)', border:'#fbcfe8', color:'#9f1239', price:7000, type:'shop', theme:null },
+        { id:'bamboo', name:'Bambu', emoji:'🎋', bg:'linear-gradient(135deg,#4d7c0f,#3f6212)', border:'#a3e635', color:'#ecfccb', price:5500, type:'shop', theme:null },
+        { id:'thunder', name:'Gök Gürültüsü', emoji:'🌩️', bg:'linear-gradient(135deg,#1e3a5f,#312e81)', border:'#fbbf24', color:'#fef9c3', price:8500, type:'shop', theme:null },
+        { id:'polar_light', name:'Kuzey Işığı II', emoji:'🌌', bg:'linear-gradient(135deg,#134e4a,#1e3a5f)', border:'#5eead4', color:'#ccfbf1', price:20000, type:'shop', theme:{bg:'linear-gradient(135deg, #020e0c, #091a2e)'} },
+        { id:'sakura_night', name:'Gece Sakura', emoji:'🌸', bg:'linear-gradient(135deg,#4a1942,#7f1d1d)', border:'#f9a8d4', color:'#fce7f3', price:15000, type:'shop', theme:{bg:'linear-gradient(135deg, #0d0010, #1a0010)'} },
+        { id:'candy', name:'Şeker', emoji:'🍬', bg:'linear-gradient(135deg,#db2777,#ec4899)', border:'#f9a8d4', color:'#fff', price:4200, type:'shop', theme:null },
+        { id:'cotton_candy', name:'Pamuk Şeker', emoji:'🍭', bg:'linear-gradient(135deg,#f9a8d4,#c4b5fd)', border:'#fce7f3', color:'#7c3aed', price:4800, type:'shop', theme:null },
+        { id:'toxic', name:'Zehirli', emoji:'☠️', bg:'linear-gradient(135deg,#4d7c0f,#365314)', border:'#a3e635', color:'#d9f99d', price:17000, type:'shop', theme:{bg:'linear-gradient(135deg, #050d00, #0a1a00)'} },
+        { id:'stealth', name:'Gizli Operasyon', emoji:'🕵️', bg:'linear-gradient(135deg,#1c1917,#292524)', border:'#44403c', color:'#78716c', price:19000, type:'shop', theme:{bg:'linear-gradient(135deg, #0c0a09, #1c1917)'} },
+        { id:'blood_moon', name:'Kan Ayı', emoji:'🌕', bg:'linear-gradient(135deg,#7f1d1d,#3b0764)', border:'#ef4444', color:'#fca5a5', price:25000, type:'shop', theme:{bg:'radial-gradient(ellipse, #0f0000, #000)'} },
+        { id:'digital', name:'Dijital', emoji:'💾', bg:'linear-gradient(135deg,#0891b2,#164e63)', border:'#22d3ee', color:'#cffafe', price:16500, type:'shop', theme:{bg:'linear-gradient(135deg, #020e14, #04242e)'} },
+        { id:'chrome', name:'Krom', emoji:'⚙️', bg:'linear-gradient(135deg,#f1f5f9,#94a3b8)', border:'#ffffff', color:'#1e293b', price:22000, type:'shop', theme:null },
+        { id:'glitch', name:'Glitch', emoji:'📺', bg:'linear-gradient(135deg, #ec4899, #3b82f6, #22c55e)', border:'rgba(255,0,255,0.5)', color:'#fff', price:28000, type:'shop', theme:{bg:'linear-gradient(135deg, #060006, #000606)'} },
+        { id:'legendary', name:'Efsanevi', emoji:'🏅', bg:'linear-gradient(135deg, #daa520, #ffd700, #fbbf24)', border:'#fffbd5', color:'#fff', price:80000, type:'shop', theme:{bg:'radial-gradient(ellipse, #1a1200, #000'} },
+        { id:'titan', name:'Titan', emoji:'🗿', bg:'linear-gradient(135deg, #44403c, #292524)', border:'#78716c', color:'#f5f5f4', price:90000, type:'shop', theme:null },
+        { id:'omega', name:'Omega', emoji:'Ω', bg:'linear-gradient(135deg, #1e1b4b, #7c3aed, #1e1b4b)', border:'#c4b5fd', color:'#ede9fe', price:120000, type:'shop', theme:{bg:'radial-gradient(ellipse at center, #07040f, #000'} },
+    ],
+
+    skinsMap: {},
+
+    // ── 100+ ACHIEVEMENTS ──
+    achievements: [
+        // === BASIC (Flip count) ===
+        { id:'ach_first', icon:'🐣', title:'İlk Adım', desc:'İlk atışını yap.', cat:'Temel', check:s=>s.ls.flips>=1, reward:10 },
+        { id:'ach_ten', icon:'🔟', title:'Onluk', desc:'10 atış yap.', cat:'Temel', check:s=>s.ls.flips>=10, reward:25 },
+        { id:'ach_fifty', icon:'5️⃣0️⃣', title:'Elli Atış', desc:'50 atış yap.', cat:'Temel', check:s=>s.ls.flips>=50, reward:50 },
+        { id:'ach_century', icon:'💯', title:'Asır', desc:'100 atış yap.', cat:'Temel', check:s=>s.ls.flips>=100, reward:100, skinReward:'century' },
+        { id:'ach_500', icon:'⭐', title:'500 Atış', desc:'500 atış yap.', cat:'Temel', check:s=>s.ls.flips>=500, reward:300 },
+        { id:'ach_1k', icon:'🔥', title:'Bin Atışçı', desc:'1.000 atış yap.', cat:'Temel', check:s=>s.ls.flips>=1000, reward:500 },
+        { id:'ach_5k', icon:'🌟', title:'5K', desc:'5.000 atış yap.', cat:'Temel', check:s=>s.ls.flips>=5000, reward:1000 },
+        { id:'ach_10k_flips', icon:'👑', title:'10K Usta', desc:'10.000 atış yap.', cat:'Temel', check:s=>s.ls.flips>=10000, reward:2000, skinReward:'cosmos' },
+        { id:'ach_25k', icon:'💎', title:'25K Efsane', desc:'25.000 atış yap.', cat:'Temel', check:s=>s.ls.flips>=25000, reward:5000 },
+        { id:'ach_50k', icon:'🏆', title:'50K Kahraman', desc:'50.000 atış yap.', cat:'Temel', check:s=>s.ls.flips>=50000, reward:10000 },
+        { id:'ach_100k', icon:'🌌', title:'100K Tanrı', desc:'100.000 atış yap.', cat:'Temel', check:s=>s.ls.flips>=100000, reward:25000 },
+        { id:'ach_500k', icon:'💫', title:'500K Süpernova', desc:'500.000 atış yap.', cat:'Temel', check:s=>s.ls.flips>=500000, reward:50000 },
+        { id:'ach_1m', icon:'♾️', title:'Milyoncu', desc:'1.000.000 atış yap.', cat:'Temel', check:s=>s.ls.flips>=1000000, reward:100000 },
+
+        // === STREAK ===
+        { id:'ach_streak3', icon:'3️⃣', title:'Üçlük', desc:'3 üst üste aynı sonuç.', cat:'Seri', check:s=>s.ls.maxStreak>=3, reward:30 },
+        { id:'ach_streak5', icon:'5️⃣', title:'Seri 5', desc:'5 üst üste aynı sonuç.', cat:'Seri', check:s=>s.ls.maxStreak>=5, reward:100, skinReward:'streak5' },
+        { id:'ach_streak10', icon:'🔟', title:'Zincirleme', desc:'10 üst üste aynı sonuç.', cat:'Seri', check:s=>s.ls.maxStreak>=10, reward:500 },
+        { id:'ach_streak15', icon:'⚡', title:'Yıldırım', desc:'15 üst üste aynı sonuç.', cat:'Seri', check:s=>s.ls.maxStreak>=15, reward:1500 },
+        { id:'ach_streak25', icon:'🔱', title:'Seri 25', desc:'25 üst üste aynı sonuç.', cat:'Seri', check:s=>s.ls.maxStreak>=25, reward:5000, skinReward:'streak_lord' },
+        { id:'ach_streak50', icon:'👑', title:'Seri 50', desc:'50 üst üste aynı sonuç.', cat:'Seri', check:s=>s.ls.maxStreak>=50, reward:15000 },
+        { id:'ach_streak100', icon:'♾️', title:'Efsane Seri 100', desc:'100 üst üste aynı sonuç.', cat:'Seri', check:s=>s.ls.maxStreak>=100, reward:50000 },
+        { id:'ach_streak200', icon:'🌌', title:'İnanılmaz Seri 200', desc:'200 üst üste aynı sonuç.', cat:'Seri', check:s=>s.ls.maxStreak>=200, reward:100000 },
+
+        // === LUCKY ===
+        { id:'ach_lucky1', icon:'🍀', title:'Şanslı!', desc:'1 şans etkinliği kazan.', cat:'Şans', check:s=>s.ls.luckyWins>=1, reward:50 },
+        { id:'ach_lucky10', icon:'🌟', title:'10 Şans', desc:'10 şans etkinliği kazan.', cat:'Şans', check:s=>s.ls.luckyWins>=10, reward:200 },
+        { id:'ach_lucky50', icon:'💫', title:'50 Şans', desc:'50 şans etkinliği kazan.', cat:'Şans', check:s=>s.ls.luckyWins>=50, reward:1000, skinReward:'lucky_charm' },
+        { id:'ach_lucky100', icon:'🎰', title:'100 Şans', desc:'100 şans etkinliği kazan.', cat:'Şans', check:s=>s.ls.luckyWins>=100, reward:3000 },
+        { id:'ach_lucky500', icon:'🤑', title:'500 Şans', desc:'500 şans etkinliği kazan.', cat:'Şans', check:s=>s.ls.luckyWins>=500, reward:15000 },
+        { id:'ach_lucky1000', icon:'💰', title:'1000 Şans', desc:'1000 şans etkinliği kazan.', cat:'Şans', check:s=>s.ls.luckyWins>=1000, reward:50000 },
+
+        // === CURRENCY ===
+        { id:'ach_earn100', icon:'💵', title:'İlk 100 Jeton', desc:'Toplam 100 jeton kazan.', cat:'Jeton', check:s=>s.ls.earned>=100, reward:20 },
+        { id:'ach_earn1k', icon:'💴', title:'1K Jeton', desc:'Toplam 1.000 jeton kazan.', cat:'Jeton', check:s=>s.ls.earned>=1000, reward:100 },
+        { id:'ach_earn10k', icon:'💶', title:'10K Jeton', desc:'Toplam 10.000 jeton kazan.', cat:'Jeton', check:s=>s.ls.earned>=10000, reward:500 },
+        { id:'ach_earn100k', icon:'💷', title:'100K Jeton', desc:'Toplam 100.000 jeton kazan.', cat:'Jeton', check:s=>s.ls.earned>=100000, reward:2000 },
+        { id:'ach_earn1m', icon:'💎', title:'Jeton Milyoneri', desc:'Toplam 1.000.000 jeton kazan.', cat:'Jeton', check:s=>s.ls.earned>=1000000, reward:20000 },
+        { id:'ach_earn10m', icon:'🏛️', title:'Merkez Bankası', desc:'Toplam 10.000.000 jeton kazan.', cat:'Jeton', check:s=>s.ls.earned>=10000000, reward:100000 },
+        { id:'ach_hold10k', icon:'🐷', title:'Biriktirici', desc:'Anlık 10.000 jeton biriktir.', cat:'Jeton', check:s=>s.currency>=10000, reward:500 },
+        { id:'ach_hold100k', icon:'🏦', title:'Patron', desc:'Anlık 100.000 jeton biriktir.', cat:'Jeton', check:s=>s.currency>=100000, reward:2000 },
+        { id:'ach_millionaire', icon:'🤑', title:'Milyoner', desc:'Anlık 1.000.000 jeton biriktir.', cat:'Jeton', check:s=>s.currency>=1000000, reward:10000, skinReward:'richer' },
+        { id:'ach_hold10m', icon:'💲', title:'Para Tanrısı', desc:'Anlık 10.000.000 jeton biriktir.', cat:'Jeton', check:s=>s.currency>=10000000, reward:50000 },
+
+        // === UPGRADES ===
+        { id:'ach_upg_bonus5', icon:'⬆️', title:'Bonus Lvl 5', desc:'Jeton çarpanını seviye 5\'e çıkar.', cat:'Yükseltme', check:s=>s.bonusLevel>=5, reward:300 },
+        { id:'ach_upg_bonus_max', icon:'💯', title:'Max Bonus', desc:'Jeton çarpanını max seviyeye çıkar.', cat:'Yükseltme', check:s=>s.bonusLevel>=15, reward:5000 },
+        { id:'ach_upg_speed_max', icon:'⚡', title:'Işık Hızı', desc:'Atış hızını max seviyeye çıkar.', cat:'Yükseltme', check:s=>s.speedLevel>=6, reward:2000 },
+        { id:'ach_upg_lucky_max', icon:'🍀', title:'Max Şans', desc:'Şans yükseltmesini max seviyeye çıkar.', cat:'Yükseltme', check:s=>s.luckyLevel>=12, reward:4000 },
+        { id:'ach_upg_auto_max', icon:'🤖', title:'Max Oto', desc:'Oto hızı max seviyeye çıkar.', cat:'Yükseltme', check:s=>s.autoSpeedLevel>=5, reward:3000 },
+        { id:'ach_all_upgrades_max', icon:'🥇', title:'Tüm Max', desc:'Tüm yükseltmeleri max yap.', cat:'Yükseltme', check:s=>s.bonusLevel>=15&&s.speedLevel>=6&&s.luckyLevel>=12&&s.autoSpeedLevel>=5, reward:25000, skinReward:'neon_god' },
+        { id:'ach_first_upgrade', icon:'🔧', title:'İlk Yükseltme', desc:'Herhangi bir yükseltme satın al.', cat:'Yükseltme', check:s=>s.bonusLevel>1||s.speedLevel>1||s.luckyLevel>1||s.autoSpeedLevel>1, reward:50 },
+
+        // === COSMETICS ===
+        { id:'ach_skin5', icon:'🎨', title:'5 Kozmetik', desc:'5 kozmetik topla.', cat:'Kozmetik', check:s=>s.inventory.length>=5, reward:500 },
+        { id:'ach_skin10', icon:'🖌️', title:'10 Kozmetik', desc:'10 kozmetik topla.', cat:'Kozmetik', check:s=>s.inventory.length>=10, reward:1000 },
+        { id:'ach_skin25', icon:'💄', title:'25 Kozmetik', desc:'25 kozmetik topla.', cat:'Kozmetik', check:s=>s.inventory.length>=25, reward:3000 },
+        { id:'ach_skin50', icon:'🏪', title:'50 Kozmetik', desc:'50 kozmetik topla.', cat:'Kozmetik', check:s=>s.inventory.length>=50, reward:10000 },
+        { id:'ach_skin_all', icon:'🌈', title:'Mutlak Koleksiyon', desc:'Tüm kozmetikleri topla.', cat:'Kozmetik', check:s=>s.inventory.length>=G.skins.length, reward:50000 },
+
+        // === MODES ===
+        { id:'ach_mode_normal100', icon:'🎯', title:'Normal Uzmanı', desc:'Normal modda 100 atış.', cat:'Mod', check:s=>(s.ls.modes['NORMAL']||0)>=100, reward:100 },
+        { id:'ach_mode_dice100', icon:'🎲', title:'Zar Ustası', desc:'Zar modunda 100 atış.', cat:'Mod', check:s=>(s.ls.modes['DICE']||0)>=100, reward:100 },
+        { id:'ach_mode_rps100', icon:'✊', title:'TKM Ustası', desc:'Taş-Kağıt-Makas 100 atış.', cat:'Mod', check:s=>(s.ls.modes['RPS']||0)>=100, reward:100 },
+        { id:'ach_mode_simple100', icon:'❓', title:'Basit Uzman', desc:'Basit modda 100 atış.', cat:'Mod', check:s=>(s.ls.modes['SIMPLE']||0)>=100, reward:100 },
+        { id:'ach_mode_category100', icon:'📚', title:'Kategori Uzmanı', desc:'Kategori modunda 100 atış.', cat:'Mod', check:s=>(s.ls.modes['CATEGORY']||0)>=100, reward:150 },
+        { id:'ach_mode_dice20_100', icon:'🎯', title:'D20 Uzmanı', desc:'D20 modunda 100 atış.', cat:'Mod', check:s=>(s.ls.modes['DICE20']||0)>=100, reward:150 },
+        { id:'ach_mode_card100', icon:'🃏', title:'Kart Ustası', desc:'Kart modunda 100 atış.', cat:'Mod', check:s=>(s.ls.modes['CARD']||0)>=100, reward:150 },
+        { id:'ach_mode_element100', icon:'🔥', title:'Element Ustası', desc:'Element modunda 100 atış.', cat:'Mod', check:s=>(s.ls.modes['ELEMENT']||0)>=100, reward:150 },
+        { id:'ach_mode_planet100', icon:'🪐', title:'Gezegen Ustası', desc:'Gezegen modunda 100 atış.', cat:'Mod', check:s=>(s.ls.modes['PLANET']||0)>=100, reward:150 },
+        { id:'ach_mode_custom50', icon:'✏️', title:'Özel Mod Oyuncusu', desc:'Özel modda 50 atış.', cat:'Mod', check:s=>(s.ls.modes['CUSTOM']||0)>=50, reward:200 },
+        { id:'ach_all_modes', icon:'🧭', title:'Mod Gezgini', desc:'Tüm modlarda en az 1 atış.', cat:'Mod', check:s=>['NORMAL','SIMPLE','DICE','DICE20','RPS','CARD','ELEMENT','PLANET','CATEGORY','CUSTOM'].every(m=>(s.ls.modes[m]||0)>=1), reward:2000, skinReward:'all_modes' },
+        { id:'ach_all_modes_1k', icon:'🗺️', title:'Tam Mod Ustası', desc:'Tüm modlarda 1000\'er atış.', cat:'Mod', check:s=>['NORMAL','SIMPLE','DICE','DICE20','RPS','CARD','ELEMENT','PLANET','CATEGORY'].every(m=>(s.ls.modes[m]||0)>=1000), reward:20000 },
+
+        // === WINS/LOSSES ===
+        { id:'ach_wins100', icon:'✔️', title:'100 Galip', desc:'100 galibiyet streak kazan.', cat:'Kayıp/Kazanç', check:s=>s.ls.wins>=100, reward:100 },
+        { id:'ach_wins1k', icon:'🎯', title:'1K Galip', desc:'1.000 galibiyet.', cat:'Kayıp/Kazanç', check:s=>s.ls.wins>=1000, reward:500 },
+        { id:'ach_wins10k', icon:'🏅', title:'10K Galip', desc:'10.000 galibiyet.', cat:'Kayıp/Kazanç', check:s=>s.ls.wins>=10000, reward:2500 },
+        { id:'ach_wins100k', icon:'🥇', title:'100K Galip', desc:'100.000 galibiyet.', cat:'Kayıp/Kazanç', check:s=>s.ls.wins>=100000, reward:15000 },
+        { id:'ach_losses100', icon:'💣', title:'100 Kayıp', desc:'100 seri kır.', cat:'Kayıp/Kazanç', check:s=>s.ls.losses>=100, reward:50 },
+        { id:'ach_losses1k', icon:'💀', title:'1K Kayıp', desc:'1.000 seri kır.', cat:'Kayıp/Kazanç', check:s=>s.ls.losses>=1000, reward:200 },
+
+        // === AUTO ===
+        { id:'ach_auto_first', icon:'🤖', title:'İlk Otomatik', desc:'Oto modu başlat.', cat:'Oto', check:s=>(s.ls.modes['auto']||0)>=1, reward:50 },
+        { id:'ach_auto_1k_run', icon:'🏭', title:'1K Oto Atış', desc:'Tek seferde 1000 oto atış yap.', cat:'Oto', check:s=>s.ls.autoRun1k===true, reward:1000 },
+        { id:'ach_auto_10k_run', icon:'🔁', title:'10K Oto Atış', desc:'Tek seferde 10000 oto atış yap.', cat:'Oto', check:s=>s.ls.autoRun10k===true, reward:5000 },
+
+        // === SPECIAL ===
+        { id:'ach_midnight_flip', icon:'🌙', title:'Gece Yarısı', desc:'Gece yarısı (00:00-01:00) bir atış yap.', cat:'Özel', check:s=>s.ls.midnightFlip===true, reward:500 },
+        { id:'ach_early_bird', icon:'🌅', title:'Erken Kuş', desc:'Sabah 06:00\'dan önce atış yap.', cat:'Özel', check:s=>s.ls.earlyBird===true, reward:300 },
+        { id:'ach_sessions5', icon:'🎮', title:'5 Oturum', desc:'5 farklı oturumda oyna.', cat:'Özel', check:s=>s.ls.sessions>=5, reward:200 },
+        { id:'ach_sessions20', icon:'📅', title:'20 Oturum', desc:'20 farklı oturumda oyna.', cat:'Özel', check:s=>s.ls.sessions>=20, reward:1000 },
+        { id:'ach_sessions50', icon:'🗓️', title:'50 Oturum', desc:'50 farklı oturumda oyna.', cat:'Özel', check:s=>s.ls.sessions>=50, reward:5000 },
+        { id:'ach_first_skin', icon:'🛍️', title:'İlk Alışveriş', desc:'İlk kozmetiği satın al.', cat:'Özel', check:s=>s.inventory.length>=2, reward:100 },
+        { id:'ach_reset', icon:'🔄', title:'Temiz Sayfa', desc:'İstatistikleri sıfırla.', cat:'Özel', check:s=>s.ls.resets>=1, reward:50 },
+        { id:'ach_reset5', icon:'🔃', title:'Beş Sıfırlama', desc:'5 kez sıfırla.', cat:'Özel', check:s=>s.ls.resets>=5, reward:200 },
+        { id:'ach_lucky_streak', icon:'🍀', title:'Seri + Şans', desc:'5 seriye ulaşırken şans etkinliği tetikle.', cat:'Özel', check:s=>s.ls.luckyStreak5===true, reward:1500 },
+        { id:'ach_big_winner', icon:'🎰', title:'Büyük Kazanma', desc:'Tek atışta 10.000+ jeton kazan.', cat:'Özel', check:s=>s.ls.bigWin===true, reward:2000 },
+
+        // === MASTER ===
+        { id:'ach_absolute_master', icon:'🌌', title:'Mutlak Usta', desc:'100 başarım tamamla.', cat:'Usta', check:s=>s.unlockedAchievements.length>=100, reward:100000, skinReward:'galaxy_master' },
+        { id:'ach_half_master', icon:'🌗', title:'Yarı Usta', desc:'50 başarım tamamla.', cat:'Usta', check:s=>s.unlockedAchievements.length>=50, reward:10000 },
+        { id:'ach_quarter', icon:'🥉', title:'Başarım Avcısı', desc:'25 başarım tamamla.', cat:'Usta', check:s=>s.unlockedAchievements.length>=25, reward:2500 },
+        { id:'ach_10_achievements', icon:'🏅', title:'10 Başarım', desc:'10 başarım tamamla.', cat:'Usta', check:s=>s.unlockedAchievements.length>=10, reward:300 },
+    ],
+
+    // ── AUDIO ──
+    audio: {
+        ctx: null,
+        init() { if(!this.ctx){ this.ctx = new (window.AudioContext||window.webkitAudioContext)(); } if(this.ctx.state==='suspended') this.ctx.resume(); },
+        play(type) {
+            this.init();
+            const o = this.ctx.createOscillator();
+            const g = this.ctx.createGain();
+            o.connect(g); g.connect(this.ctx.destination);
+            const t = this.ctx.currentTime;
+            if(type==='flip') { o.type='triangle'; o.frequency.setValueAtTime(180,t); o.frequency.exponentialRampToValueAtTime(700,t+0.08); g.gain.setValueAtTime(0.08,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.1); o.start(t); o.stop(t+0.1); }
+            else if(type==='win') { o.type='sine'; o.frequency.setValueAtTime(550,t); o.frequency.exponentialRampToValueAtTime(1100,t+0.12); g.gain.setValueAtTime(0.15,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.35); o.start(t); o.stop(t+0.35); }
+            else if(type==='achievement') { this.play('win'); setTimeout(()=>this.play('win'),120); setTimeout(()=>this.play('win'),240); }
+            else if(type==='lucky') { o.type='sawtooth'; o.frequency.setValueAtTime(300,t); o.frequency.exponentialRampToValueAtTime(1500,t+0.2); g.gain.setValueAtTime(0.1,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.3); o.start(t); o.stop(t+0.3); }
+        }
+    },
+
+    // ── DATA ──
+    data: {
+        KEY: 'CFG_V5',
+        load() {
+            G.skins.forEach(s=>{ G.skinsMap[s.id]=s; });
+            const raw = localStorage.getItem(G.data.KEY);
+            const theme = localStorage.getItem('CFG_V5_THEME');
+            if(theme==='light') document.body.classList.add('light-mode');
+
+            if(raw){
+                try{
+                    const p = JSON.parse(raw);
+                    G.state = { ...G.state, ...p, ls: { ...G.state.ls, ...(p.ls||{}) } };
+                    G.skins.forEach(s=>{ s.unlocked = G.state.inventory.includes(s.id); });
+                    G.state.flipDur = G.upgrades.speed.effect(G.state.speedLevel);
+                    document.documentElement.style.setProperty('--flip-dur', G.state.flipDur+'s');
+                    G.state.bonus = G.upgrades.bonus.effect(G.state.bonusLevel);
+                } catch(e){ console.error(e); }
+            } else {
+                G.logic.setMode('NORMAL', true);
+            }
+
+            // Check special time achievements
+            const h = new Date().getHours();
+            if(h===0||h===1) G.state.ls.midnightFlip=true;
+            if(h<6) G.state.ls.earlyBird=true;
+            G.state.ls.sessions = (G.state.ls.sessions||0)+1;
+
+            G.ui.render();
+            UI.renderAchievements();
+        },
+        save() { localStorage.setItem(G.data.KEY, JSON.stringify(G.state)); },
+        export() {
+            const a = document.createElement('a');
+            a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(G.state));
+            a.download = 'coinflip_v5_backup.json';
+            a.click();
+        },
+        import(input) {
+            const f = input.files[0]; if(!f) return;
+            const r = new FileReader();
+            r.onload = e => { try{ G.state={...G.state,...JSON.parse(e.target.result)}; G.data.save(); location.reload(); } catch(ex){ alert('Dosya hatalı!'); } };
+            r.readAsText(f);
+        }
+    },
+
+    // ── LOGIC ──
+    logic: {
+        setMode(name, silent=false) {
+            if(G.state.isAuto) { UI.toast('Oto modda mod değiştirilemez!','⚠️'); return; }
+            G.state.mode = name;
+            if(name==='WEIGHTED') {
+                if(!G.state.weightedConfig.length) G.state.weightedConfig=JSON.parse(JSON.stringify(G.defaults.NORMAL));
+                G.state.outcomes = JSON.parse(JSON.stringify(G.state.weightedConfig));
+            } else if(name==='CUSTOM') {
+                if(!G.state.customOutcomes.length){ UI.toast('Önce özel mod ayarla!','⚠️'); G.logic.setMode('NORMAL'); return; }
+                G.state.outcomes = JSON.parse(JSON.stringify(G.state.customOutcomes));
+            } else if(G.defaults[name]) {
+                G.state.outcomes = JSON.parse(JSON.stringify(G.defaults[name]));
+            }
+            G.state.outcomes.forEach(o=>o.count=0);
+            G.state.total=0; G.state.streak=0; G.state.lastId=null;
+            document.getElementById('menu-modal').classList.remove('open');
+            document.getElementById('custom-modal').classList.remove('open');
+            document.getElementById('weighted-modal').classList.remove('open');
+            G.ui.render();
+            G.ui.applySkin(G.state.activeSkin);
+            if(!silent) G.data.save();
+        },
+
+        getWeightedResult() {
+            const total = G.state.outcomes.reduce((s,o)=>s+o.weight,0);
+            let r = Math.random()*total;
+            for(const o of G.state.outcomes){ if(r<o.weight) return o; r-=o.weight; }
+            return G.state.outcomes[G.state.outcomes.length-1];
+        },
+
+        _autoInterval: null,
+
+        flip() {
+            const coin = document.getElementById('coin');
+            if(coin.classList.contains('is-flipping')) return;
+
+            // Init audio on first interaction
+            G.audio.init();
+            G.audio.play('flip');
+
+            coin.classList.remove('coin-result-reveal');
+            coin.textContent='⌛';
+            coin.classList.add('is-flipping');
+            document.getElementById('result-text').textContent='Dönüyor...';
+            document.getElementById('flip-message').className='flip-message';
+            document.getElementById('flip-message').textContent='';
+            if(!G.state.isAuto) G.ui.setControls(false);
+
+            const winner = (G.state.mode==='WEIGHTED'||G.state.mode==='CUSTOM')
+                ? G.logic.getWeightedResult()
+                : G.state.outcomes[Math.floor(Math.random()*G.state.outcomes.length)];
+
+            const dur = G.state.flipDur || 1.8;
+
+            setTimeout(()=>{
+                coin.classList.remove('is-flipping');
+                coin.textContent = winner.emoji;
+                coin.classList.add('coin-result-reveal');
+
+                // Stats update
+                const wi = G.state.outcomes.findIndex(o=>o.id===winner.id);
+                if(wi!==-1) G.state.outcomes[wi].count++;
+                G.state.total++;
+                G.state.ls.flips++;
+                G.state.ls.modes[G.state.mode] = (G.state.ls.modes[G.state.mode]||0)+1;
+
+                const isWeighted = G.state.mode==='WEIGHTED';
+                let streakBonus=0, isRecord=false, isLucky=false, luckyGain=0;
+
+                if(!isWeighted){
+                    if(G.state.lastId===winner.id){ G.state.streak++; G.state.ls.wins++; }
+                    else { G.state.streak=1; G.state.ls.losses++; }
+                    G.state.lastId=winner.id;
+                    if(G.state.streak>G.state.bestStreak){ G.state.bestStreak=G.state.streak; isRecord=true; }
+                    if(G.state.streak>G.state.ls.maxStreak) G.state.ls.maxStreak=G.state.streak;
+                    if(G.state.streak>=2){ streakBonus = Math.floor((G.state.streak-1) * (G.state.bonus||1) * G.state.streak * 0.5); }
+                    if(G.state.streak>=5 && !G.state.ls.luckyStreak5) { G.state.ls.luckyStreak5=true; } // Will be checked again with lucky
+                } else {
+                    G.state.streak=0; G.state.lastId=null;
+                }
+
+                const base = G.state.bonus||1;
+                isLucky = !isWeighted && Math.random()<0.05;
+                if(isLucky){
+                    luckyGain = G.upgrades.lucky.effect(G.state.luckyLevel);
+                    G.state.ls.luckyWins++;
+                    if(G.state.streak>=5) G.state.ls.luckyStreak5=true;
+                    G.audio.play('lucky');
+                    coin.classList.add('lucky-flash');
+                    setTimeout(()=>coin.classList.remove('lucky-flash'),1500);
+                }
+
+                const totalGain = base + streakBonus + (isLucky?luckyGain:0);
+                if(totalGain>=10000) G.state.ls.bigWin=true;
+                G.state.currency += totalGain;
+                G.state.ls.earned += totalGain;
+                G.state.ls.totalCurrency = (G.state.ls.totalCurrency||0) + totalGain;
+
+                // Result display
+                const resultEl = document.getElementById('result-text');
+                resultEl.textContent = winner.name;
+                resultEl.style.color = winner.color || 'var(--primary-light)';
+
+                const msgEl = document.getElementById('flip-message');
+                if(isLucky){
+                    msgEl.className='flip-message lucky';
+                    msgEl.textContent=`💥 ŞANS ETKİNLİĞİ! +${totalGain} 💰 (Bonus: +${luckyGain})`;
+                } else if(G.state.streak>=2){
+                    msgEl.className='flip-message streak';
+                    msgEl.textContent=`🔥 Seri x${G.state.streak} → +${totalGain} 💰 ${isRecord?'(YENİ REKOR!)':''}`;
+                    if(isRecord){ G.audio.play('win'); coin.classList.add('record-pulse'); setTimeout(()=>coin.classList.remove('record-pulse'),2000); }
+                } else {
+                    msgEl.className='flip-message';
+                    msgEl.textContent=`+${totalGain} 💰`;
+                }
+
+                // Auto tracking
+                G.state.ls.modes['auto'] = (G.state.ls.modes['auto']||0)+1;
+
+                G.ui.renderStats();
+                G.ui.renderHeader();
+                G.logic.checkAchievements();
+                G.data.save();
+
+                if(!G.state.isAuto) G.ui.setControls(true);
+
+                // Auto flip tracking
+                if(G.state.isAuto){
+                    G.state.autoCount++;
+                    if(G.state.autoCount>=1000&&!G.state.ls.autoRun1k) G.state.ls.autoRun1k=true;
+                    if(G.state.autoCount>=10000&&!G.state.ls.autoRun10k) G.state.ls.autoRun10k=true;
+                    if(G.state.autoLimit!==999999 && G.state.autoCount>=G.state.autoLimit){
+                        G.logic.stopAuto();
+                    }
+                }
+
+            }, dur*1000);
+        },
+
+        toggleAuto() {
+            if(G.state.isAuto){ G.logic.stopAuto(); return; }
+            G.state.autoLimit = parseInt(document.getElementById('auto-limit').value);
+            G.state.autoCount = 0;
+            G.state.isAuto = true;
+            document.getElementById('btn-auto').textContent='⏹ Durdur';
+            document.getElementById('btn-auto').classList.add('btn-danger');
+            document.getElementById('btn-auto').classList.remove('btn-secondary');
+            document.getElementById('btn-flip').disabled=true;
+
+            const delay = G.upgrades.autoSpeed.effect(G.state.autoSpeedLevel);
+            G.state.ls.modes['auto'] = G.state.ls.modes['auto']||0;
+
+            G.logic._autoInterval = setInterval(()=>{
+                const coin=document.getElementById('coin');
+                if(!coin.classList.contains('is-flipping')) G.logic.flip();
+            }, delay + (G.state.flipDur||1.8)*1000 + 10);
+        },
+
+        stopAuto() {
+            G.state.isAuto=false;
+            clearInterval(G.logic._autoInterval);
+            document.getElementById('btn-auto').textContent='🚀 Otomatik';
+            document.getElementById('btn-auto').classList.remove('btn-danger');
+            document.getElementById('btn-auto').classList.add('btn-secondary');
+            document.getElementById('btn-flip').disabled=false;
+            G.ui.setControls(true);
+        },
+
+        checkAchievements() {
+            G.achievements.forEach(ach=>{
+                if(!G.state.unlockedAchievements.includes(ach.id) && ach.check(G.state)){
+                    G.state.unlockedAchievements.push(ach.id);
+                    G.state.currency += ach.reward;
+                    G.state.ls.earned += ach.reward;
+                    G.audio.play('achievement');
+                    UI.toast(`🏆 ${ach.title} (+${ach.reward} 💰)`, '✨');
+                    confetti(ach.reward>1000?200:80);
+                    if(ach.skinReward && !G.state.inventory.includes(ach.skinReward)){
+                        G.state.inventory.push(ach.skinReward);
+                        G.skinsMap[ach.skinReward].unlocked=true;
+                        UI.toast(`🎨 Yeni kozmetik: ${G.skinsMap[ach.skinReward].name}!`,'🌟');
+                    }
+                    UI.renderAchievements();
+                    G.ui.renderHeader();
+                }
+            });
+        },
+
+        resetStats() {
+            if(!confirm('Bu moda ait istatistikler sıfırlanacak. Emin misin?')) return;
+            G.state.outcomes.forEach(o=>o.count=0);
+            G.state.total=0; G.state.streak=0; G.state.lastId=null;
+            G.state.ls.resets = (G.state.ls.resets||0)+1;
+            G.ui.render();
+            G.data.save();
+        },
+
+        hardReset() {
+            if(!confirm('TÜM VERİLER KAYBOLACAK! (Başarımlar, jetonlar, kozmetikler) Devam?')) return;
+            if(!confirm('Gerçekten emin misin? Bu işlem geri alınamaz!')) return;
+            localStorage.removeItem(G.data.KEY);
+            location.reload();
+        },
+
+        saveWeighted() {
+            const inputs = document.querySelectorAll('#weighted-inputs input[type="number"]');
+            let total=0, config=[];
+            const base = G.defaults.NORMAL;
+            inputs.forEach((inp,i)=>{ const w=parseFloat(inp.value)||0; total+=w; config.push({...base[i],weight:w}); });
+            if(Math.abs(total-100)>0.01){ document.getElementById('weighted-error').textContent='Toplam %100 olmalı!'; return; }
+            G.state.weightedConfig = config;
+            G.logic.setMode('WEIGHTED');
+        },
+
+        saveCustom() {
+            const groups = document.querySelectorAll('#custom-inputs .custom-group');
+            if(groups.length<2){ alert('En az 2 sonuç gerekli!'); return; }
+            const outcomes=[];
+            groups.forEach((g,i)=>{
+                const name=g.querySelector('.c-name').value||'Sonuç'+(i+1);
+                const emoji=g.querySelector('.c-emoji').value||'❓';
+                const color=g.querySelector('.c-color').value||'#888';
+                outcomes.push({id:'cu'+i, name, emoji, color, count:0, weight:100/groups.length});
+            });
+            G.state.customOutcomes=outcomes;
+            G.defaults.CUSTOM=outcomes;
+            G.logic.setMode('CUSTOM');
+        },
+
+        buyUpgrade(key) {
+            const upg = G.upgrades[key];
+            const lvlKey = key+'Level';
+            const curLevel = G.state[lvlKey]||1;
+            if(curLevel>=upg.maxLevel){ UI.toast('Maksimum seviye!','⚡'); return; }
+            const cost = Math.floor(upg.baseCost * Math.pow(upg.costMul, curLevel-1));
+            if(G.state.currency<cost){ UI.toast('Yeterli jeton yok!','❌'); return; }
+            G.state.currency-=cost;
+            G.state[lvlKey]++;
+            if(key==='speed'){
+                G.state.flipDur = upg.effect(G.state[lvlKey]);
+                document.documentElement.style.setProperty('--flip-dur', G.state.flipDur+'s');
+            }
+            if(key==='bonus') G.state.bonus = upg.effect(G.state[lvlKey]);
+            G.logic.checkAchievements();
+            G.ui.renderHeader();
+            G.data.save();
+            UI.renderShop();
+            UI.toast(`${upg.name} → Seviye ${G.state[lvlKey]}!`,'⬆️');
+        },
+
+        equipSkin(id) {
+            const skin = G.skinsMap[id];
+            if(!skin) return;
+            if(!G.state.inventory.includes(id)){
+                if(skin.price<=0){ UI.toast('Bu kozmetik kilitli!','🔒'); return; }
+                if(G.state.currency<skin.price){ UI.toast('Yeterli jeton yok!','❌'); return; }
+                G.state.currency-=skin.price;
+                G.state.inventory.push(id);
+                skin.unlocked=true;
+                G.logic.checkAchievements();
+                UI.toast(`${skin.name} satın alındı!`,'🎨');
+            }
+            G.state.activeSkin=id;
+            G.ui.applySkin(id);
+            G.ui.renderHeader();
+            G.data.save();
+            UI.renderShop();
+        }
+    },
+
+    // ── UI ──
+    ui: {
+        render() {
+            G.ui.renderStats();
+            G.ui.renderHeader();
+            G.ui.applySkin(G.state.activeSkin);
+            // Update mode display
+            const modeNames = { NORMAL:'Normal Mod',SIMPLE:'Basit Mod',DICE:'Zar Modu',DICE20:'D20 Zar',RPS:'Taş-Kağıt-Makas',CARD:'Kart Modu',ELEMENT:'Element Modu',PLANET:'Gezegen Modu',CATEGORY:'Kategori Modu',WEIGHTED:'Ağırlıklı Mod',CUSTOM:'Özel Mod' };
+            document.getElementById('mode-display').textContent = modeNames[G.state.mode]||G.state.mode;
+            document.getElementById('stats-mode-name').textContent = 'İstatistikler — '+(modeNames[G.state.mode]||G.state.mode);
+        },
+
+        renderHeader() {
+            document.getElementById('currency-display').textContent = '💰 '+G.state.currency.toLocaleString('tr-TR');
+            const sb = document.getElementById('streak-badge');
+            if(G.state.streak>=3){ sb.style.display='flex'; sb.textContent='🔥 '+G.state.streak; }
+            else sb.style.display='none';
+        },
+
+        renderStats() {
+            const container = document.getElementById('stats-container');
+            const total = G.state.total||1;
+            const colors=['#ef4444','#06d6a0','#3b82f6','#f97316','#8b5cf6','#ec4899','#fbbf24','#22c55e','#06b6d4','#a855f7','#f43f5e','#84cc16'];
+            container.innerHTML = G.state.outcomes.map((o,i)=>{
+                const pct = ((o.count/total)*100).toFixed(1);
+                const color = o.color||colors[i%colors.length];
+                return `<div class="stat-pill">
+                    <span class="stat-emoji">${o.emoji}</span>
+                    <div class="stat-name">${o.name}</div>
+                    <div class="stat-count">${o.count}</div>
+                    <div class="stat-bar-wrapper"><div class="stat-bar" style="width:${pct}%;background:${color}"></div></div>
+                    <div style="font-size:0.7rem;color:var(--muted);margin-top:3px;">${pct}%</div>
+                </div>`;
+            }).join('');
+            document.getElementById('total-flips').textContent = G.state.total.toLocaleString('tr-TR');
+            document.getElementById('best-streak').textContent = G.state.bestStreak;
+            document.getElementById('cur-streak').textContent = G.state.streak;
+        },
+
+        applySkin(id) {
+            const skin = G.skinsMap[id]||G.skinsMap['default'];
+            const coin = document.getElementById('coin');
+            coin.style.background = skin.bg;
+            coin.style.borderColor = skin.border;
+            coin.style.color = skin.color||'#fff';
+            // Body theme
+            document.body.style.background = '';
+            document.body.style.backgroundImage = '';
+            if(skin.theme && skin.theme.bg){
+                document.body.style.background = skin.theme.bg;
+            }
+        },
+
+        setControls(enabled) {
+            document.getElementById('btn-flip').disabled=!enabled;
+        },
+
+        updateFlipSpeed() {
+            G.state.flipDur = G.upgrades.speed.effect(G.state.speedLevel||1);
+            document.documentElement.style.setProperty('--flip-dur', G.state.flipDur+'s');
+        }
+    }
+};
+
+// ── UI (non-game) ──
+const UI = {
+    currentAchCat: 'Tümü',
+
+    toast(msg, icon='✅') {
+        const c = document.getElementById('toast-container');
+        const t = document.createElement('div');
+        t.className='toast';
+        t.textContent=(icon?icon+' ':'')+msg;
+        c.appendChild(t);
+        setTimeout(()=>t.remove(),3000);
+    },
+
+    toggleMenu() {
+        document.getElementById('menu-modal').classList.toggle('open');
+    },
+
+    toggleDark() {
+        document.body.classList.toggle('dark');
+    },
+
+    openShop() {
+        UI.renderShop();
+        document.getElementById('shop-modal').classList.add('open');
+    },
+
+    renderShop() {
+        document.getElementById('shop-currency').textContent = '💰 '+G.state.currency.toLocaleString('tr-TR')+' Jeton';
+
+        // Upgrades
+        const upgList = document.getElementById('upgrade-list');
+        upgList.innerHTML = Object.entries(G.upgrades).map(([key,upg])=>{
+            const lvlKey = key+'Level';
+            const lv = G.state[lvlKey]||1;
+            const cost = Math.floor(upg.baseCost * Math.pow(upg.costMul, lv-1));
+            const isMax = lv>=upg.maxLevel;
+            const pips = Array.from({length:upg.maxLevel},(_,i)=>`<div class="upgrade-pip ${i<lv?'filled':''}"></div>`).join('');
+            return `<div class="upgrade-item">
+                <div class="upgrade-icon">${upg.name.split(' ')[0]}</div>
+                <div class="upgrade-info">
+                    <div class="upgrade-name">${upg.name}</div>
+                    <div class="upgrade-desc">${upg.desc(lv)}</div>
+                    <div class="upgrade-level-bar">${pips}</div>
+                </div>
+                <button class="btn ${isMax?'btn-secondary':'btn-primary'}" style="padding:10px 14px; font-size:0.8rem; white-space:nowrap;"
+                    onclick="G.logic.buyUpgrade('${key}')" ${isMax?'disabled':''}>
+                    ${isMax?'MAX':'💰 '+cost.toLocaleString('tr-TR')}
+                </button>
+            </div>`;
+        }).join('');
+
+        // Skins grouped
+        const grid = document.getElementById('skins-grid');
+        grid.innerHTML = G.skins.map(s=>{
+            const owned = G.state.inventory.includes(s.id);
+            const equipped = G.state.activeSkin===s.id;
+            let badge='';
+            if(s.type==='achievement') badge=`<div class="skin-badge achievement">🔒 Başarım</div>`;
+            if(owned && !equipped) badge=`<div class="skin-badge owned">✓ Var</div>`;
+            if(equipped) badge=`<div class="skin-badge owned">✓ Takılı</div>`;
+            return `<div class="skin-item ${equipped?'equipped':''} ${!owned&&s.type!=='achievement'?'':''}\"
+                style="background:${s.bg}; ${!owned?'opacity:0.65':''}"
+                onclick="G.logic.equipSkin('${s.id}')">
+                ${badge}
+                <span class="skin-emoji">${s.emoji}</span>
+                <div class="skin-name" style="color:${s.color||'#fff'}">${s.name}</div>
+                <div class="skin-price">${owned?'✓':'💰'+s.price.toLocaleString('tr-TR')}</div>
+            </div>`;
+        }).join('');
+    },
+
+    openAnalyst() {
+        const s = G.state;
+        const ls = s.ls;
+        const modes = ls.modes||{};
+        const total = ls.flips||0;
+        const topMode = Object.entries(modes).filter(([k])=>k!=='auto').sort((a,b)=>b[1]-a[1])[0];
+        const content = document.getElementById('analyst-content');
+        content.innerHTML = `
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
+            ${[
+                ['🎰','Toplam Atış',total.toLocaleString('tr-TR')],
+                ['🔥','Rekor Seri',s.bestStreak],
+                ['💰','Toplam Kazanç',ls.earned.toLocaleString('tr-TR')+' 💰'],
+                ['🍀','Şans Sayısı',ls.luckyWins],
+                ['✔️','Seri Galibiyet',ls.wins.toLocaleString('tr-TR')],
+                ['💣','Seri Kırma',ls.losses.toLocaleString('tr-TR')],
+                ['🎮','Oturum',ls.sessions],
+                ['🏆','Başarım',s.unlockedAchievements.length+'/'+G.achievements.length],
+            ].map(([e,n,v])=>`<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px;text-align:center;">
+                <div style="font-size:1.5rem;">${e}</div>
+                <div style="font-size:0.75rem;color:var(--muted);">${n}</div>
+                <div style="font-weight:700;font-size:1rem;font-family:'Orbitron',sans-serif;">${v}</div>
+            </div>`).join('')}
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:14px;">
+            <div style="font-size:0.8rem;font-weight:700;color:var(--primary-light);margin-bottom:10px;font-family:'Orbitron',sans-serif;">MOD DAĞILIMI</div>
+            ${Object.entries(modes).filter(([k])=>k!=='auto').map(([m,c])=>`
+            <div class="analyst-stat-row">
+                <span>${m}</span>
+                <div style="flex:1;margin:0 10px;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;">
+                    <div style="width:${total?Math.round(c/total*100):0}%;height:100%;background:var(--primary);border-radius:2px;"></div>
+                </div>
+                <span class="analyst-stat-val">${c.toLocaleString('tr-TR')}</span>
+            </div>`).join('')}
+        </div>
+        <div style="margin-top:14px;padding:14px;background:rgba(6,214,160,0.08);border:1px solid rgba(6,214,160,0.2);border-radius:14px;">
+            <div style="font-size:0.85rem;font-weight:600;color:var(--accent);">🔮 Olasılık Asistanı (Eğlence Amaçlı)</div>
+            <div style="font-size:0.9rem;margin-top:8px;color:var(--text);">
+                ${G.logic._getPrediction()}
+            </div>
+            <div style="font-size:0.75rem;color:var(--danger);margin-top:6px;">* Gerçek olasılıklar etkilenmez, eğlence amaçlıdır.</div>
+        </div>`;
+        document.getElementById('analyst-modal').classList.add('open');
+    },
+
+    renderAchievements() {
+        const cats = ['Tümü', ...new Set(G.achievements.map(a=>a.cat))];
+        const tabsEl = document.getElementById('ach-tabs');
+        tabsEl.innerHTML = cats.map(c=>`<div class="ach-tab ${UI.currentAchCat===c?'active':''}" onclick="UI.filterAch('${c}')">${c}</div>`).join('');
+
+        const filtered = UI.currentAchCat==='Tümü'?G.achievements:G.achievements.filter(a=>a.cat===UI.currentAchCat);
+        const grid = document.getElementById('ach-grid');
+        grid.innerHTML = filtered.map(a=>{
+            const unlocked = G.state.unlockedAchievements.includes(a.id);
+            const hasSkin = !!a.skinReward;
+            return `<div class="ach-item ${unlocked?'unlocked':''} ${hasSkin?'skin-reward':''}"
+                title="${a.title}"
+                onclick="UI.showAchInfo('${a.id}')">${a.icon}</div>`;
+        }).join('');
+
+        const total = G.achievements.length;
+        const done = G.state.unlockedAchievements.length;
+        const catDone = filtered.filter(a=>G.state.unlockedAchievements.includes(a.id)).length;
+        document.getElementById('ach-unlocked-count').textContent=done;
+        document.getElementById('ach-total-count').textContent=total;
+        document.getElementById('ach-cat-counter').textContent=`${catDone}/${filtered.length}`;
+        document.getElementById('ach-progress-fill').style.width=(done/total*100)+'%';
+        document.getElementById('ach-pct').textContent=Math.round(done/total*100)+'%';
+    },
+
+    filterAch(cat) {
+        UI.currentAchCat=cat;
+        UI.renderAchievements();
+    },
+
+    showAchInfo(id) {
+        const a = G.achievements.find(x=>x.id===id);
+        const unlocked = G.state.unlockedAchievements.includes(id);
+        let rewardHtml=`<div class="ach-info-reward ${unlocked?'completed':''}">`;
+        if(unlocked) rewardHtml+=`✅ Tamamlandı — +${a.reward} 💰`;
+        else rewardHtml+=`🏅 Ödül: +${a.reward} 💰`;
+        if(a.skinReward) rewardHtml+=` + 🎨 ${G.skinsMap[a.skinReward]?.name||'?'} Kozmetik`;
+        rewardHtml+='</div>';
+
+        document.getElementById('ach-info-content').innerHTML=`
+            <div class="ach-big-icon">${a.icon}</div>
+            <div class="ach-info-title">${a.title}</div>
+            <div class="ach-info-desc">${a.desc}</div>
+            <div style="font-size:0.75rem;padding:4px 10px;border-radius:10px;background:rgba(255,255,255,0.05);color:var(--muted);display:inline-block;margin-bottom:12px;">${a.cat}</div>
+            ${rewardHtml}`;
+        document.getElementById('ach-info-modal').classList.add('open');
+    },
+
+    openWeighted() {
+        document.getElementById('menu-modal').classList.remove('open');
+        const inputs = document.getElementById('weighted-inputs');
+        const base = G.state.weightedConfig.length?G.state.weightedConfig:G.defaults.NORMAL;
+        inputs.innerHTML = base.map((o,i)=>`
+            <div class="input-group">
+                <span style="font-size:1.4rem;">${o.emoji}</span>
+                <input class="input-text" value="${o.name}" readonly style="flex:1;opacity:0.7">
+                <input type="number" class="input-text" value="${o.weight}" min="0" max="100" step="0.01"
+                    id="wi-${i}" style="width:80px;" oninput="UI.updateWeightedTotal()">
+                <span style="color:var(--muted)">%</span>
+            </div>`).join('');
+        UI.updateWeightedTotal();
+        document.getElementById('weighted-modal').classList.add('open');
+    },
+
+    updateWeightedTotal() {
+        const inputs = document.querySelectorAll('#weighted-inputs input[type="number"]');
+        let t=0; inputs.forEach(i=>t+=parseFloat(i.value)||0);
+        const el = document.getElementById('weighted-total-val');
+        const err = document.getElementById('weighted-error');
+        el.textContent=t.toFixed(2)+'%';
+        el.style.color = Math.abs(t-100)>0.01?'var(--danger)':'var(--accent)';
+        err.textContent = Math.abs(t-100)>0.01?`Fark: ${(t-100).toFixed(2)}%`:'';
+    },
+
+    openCustom() {
+        document.getElementById('menu-modal').classList.remove('open');
+        const cont = document.getElementById('custom-inputs');
+        cont.innerHTML='';
+        if(G.state.customOutcomes.length){
+            G.state.customOutcomes.forEach(o=>UI.addCustomInput(o.name,o.emoji,o.color));
+        } else {
+            UI.addCustomInput('Yazı','✍️','#ef4444');
+            UI.addCustomInput('Tura','👑','#06d6a0');
+        }
+        document.getElementById('custom-modal').classList.add('open');
+    },
+
+    addCustomInput(name='',emoji='❓',color='#7c3aed') {
+        const cont = document.getElementById('custom-inputs');
+        if(cont.children.length>=6){ UI.toast('Maksimum 6 sonuç!','⚠️'); return; }
+        const i = Date.now();
+        const div=document.createElement('div');
+        div.className='input-group custom-group';
+        div.innerHTML=`
+            <input class="input-text c-name" placeholder="Ad" value="${name}" style="flex:2">
+            <input class="input-text c-emoji input-emoji-box" placeholder="🎯" value="${emoji}" maxlength="2" style="width:50px">
+            <input type="color" class="input-color c-color" value="${color}">
+            <button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:1.2rem;">🗑️</button>`;
+        cont.appendChild(div);
+    }
+};
+
+// ── Game logic extension ──
+G.logic._getPrediction = function(){
+    const s=G.state;
+    if(!s.total) return 'Henüz yeterli veri yok. Atış yapmaya başla!';
+    const last=s.lastId;
+    if(!last) return 'Sonraki sonuç belirsiz...';
+    const o = s.outcomes.find(x=>x.id===last);
+    if(!o) return '?';
+    const pct=(o.count/s.total*100).toFixed(1);
+    if(parseFloat(pct)>60) return `${o.emoji} ${o.name} çok fazla çıkıyor (${pct}%)! Olasılık dengesi bekleniyor.`;
+    if(parseFloat(pct)<40&&s.outcomes.length===2) return `${o.emoji} ${o.name} az çıkıyor (${pct}%). Yakında dengelenebilir!`;
+    if(s.streak>=5) return `🔥 ${s.streak} tur serisi! Duracak mı? İstatistiksel olarak değişim olabilir.`;
+    return `Mevcut seri: ${s.streak}. Her atış bağımsızdır — olasılık her zaman eşit!`;
+};
+
+// ── CONFETTI ──
+function confetti(count=80) {
+    const canvas = document.getElementById('confetti-canvas');
+    canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+    const ctx = canvas.getContext('2d');
+    const particles=[];
+    const cols=['#7c3aed','#06d6a0','#fbbf24','#f72585','#3b82f6','#ec4899'];
+    for(let i=0;i<count;i++){
+        particles.push({
+            x:Math.random()*canvas.width, y:Math.random()*canvas.height-canvas.height,
+            w:Math.random()*12+4, h:Math.random()*6+3,
+            col:cols[Math.floor(Math.random()*cols.length)],
+            vx:(Math.random()-0.5)*4, vy:Math.random()*4+2,
+            rot:Math.random()*360, vr:(Math.random()-0.5)*8
+        });
+    }
+    let frame=0;
+    function animate(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        particles.forEach(p=>{
+            p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+            ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+            ctx.fillStyle=p.col; ctx.globalAlpha=Math.max(0,1-frame/80);
+            ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+            ctx.restore();
+        });
+        frame++;
+        if(frame<90) requestAnimationFrame(animate);
+        else ctx.clearRect(0,0,canvas.width,canvas.height);
+    }
+    animate();
+}
+
+// ── INIT ──
+window.onload=()=>{
+    G.data.load();
+    document.body.addEventListener('click',()=>G.audio.init(),{once:true});
+};
+</script>
+</body>
+</html>
