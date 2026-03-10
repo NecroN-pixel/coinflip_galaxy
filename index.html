@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>CoinFlip Galaxy ✦ V6</title>
+<title>CoinFlip Galaxy ✦ V7</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 /* ══ THEMES ══ */
@@ -64,6 +64,21 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .adiv::before{left:0;}.adiv::after{right:0;}
 .alink{text-align:center;font-size:.72rem;color:var(--mut);margin-top:7px;}
 .alink span{color:var(--pl);cursor:pointer;}
+.ald{display:flex;align-items:center;gap:10px;margin-bottom:8px;cursor:pointer;padding:9px 10px;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;transition:.12s;}
+.ald:active,.ald:hover{background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.25);}
+.ald-ico{font-size:1.2rem;width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+  border-radius:8px;background:rgba(255,255,255,.05);border:1px solid var(--brd);flex-shrink:0;}
+.ald-txt{font-size:.76rem;font-weight:700;margin-bottom:2px;}
+.ald-sub{font-size:.6rem;color:var(--mut);}
+.aload{text-align:center;padding:24px 10px;color:var(--mut);font-size:.76rem;}
+.ald{display:flex;align-items:center;gap:8px;margin-bottom:10px;cursor:pointer;}
+.ald-ico{font-size:1.4rem;width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+  border-radius:9px;background:rgba(255,255,255,.05);border:1px solid var(--brd);flex-shrink:0;}
+.ald-txt{font-size:.78rem;font-weight:600;}
+.ald-sub{font-size:.6rem;color:var(--mut);}
+.ald:active .ald-ico{background:rgba(139,92,246,.15);}
+.aload{text-align:center;padding:20px;color:var(--mut);font-size:.76rem;}
 /* ══ HEADER ══ */
 .hdr{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;
   gap:4px;padding:6px 8px;background:rgba(7,7,15,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--brd);}
@@ -325,32 +340,57 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 <!-- ══ AUTH ══ -->
 <div id="auth">
  <div class="abox">
-  <div class="alogo">✦ CoinFlip Galaxy</div>
-  <div class="asub">Galaksinin en büyük kumarbazı ol</div>
+  <div class="alogo">✦ COINFLIP GALAXY</div>
+  <div class="asub">V7 — Block Coin Season</div>
+
+  <!-- STEP 1: Giriş Yöntemi Seç -->
   <div id="as1" class="astep on">
-   <div style="font-size:.78rem;font-weight:700;margin-bottom:10px">👋 Bir kullanıcı adı seç</div>
-   <input class="ai" id="a-nm" placeholder="Kullanıcı adı (2–20 karakter)" maxlength="20">
-   <div class="aerr" id="a-n1"></div>
-   <button class="abtn ap" onclick="A.step1()">Devam →</button>
-  </div>
-  <div id="as2" class="astep">
-   <div style="font-size:.78rem;font-weight:700;margin-bottom:10px">🔐 Giriş yöntemi</div>
+   <div style="font-size:.76rem;font-weight:700;margin-bottom:12px;color:var(--txt)">🚀 Nasıl giriş yapmak istiyorsun?</div>
    <div class="aerr" id="a-m1"></div>
-   <button class="abtn ag" onclick="A.google()">
-    <svg width="14" height="14" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.34-8.16 2.34-6.26 0-11.57-3.59-13.46-8.83l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-    Google ile Giriş
-   </button>
-   <div class="adiv">veya e-posta</div>
+   <div class="ald" onclick="A.google()">
+    <div class="ald-ico"><svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.34-8.16 2.34-6.26 0-11.57-3.59-13.46-8.83l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg></div>
+    <div><div class="ald-txt">Google ile Giriş</div><div class="ald-sub">Hızlı ve kolay</div></div>
+   </div>
+   <div class="ald" onclick="A.showEmail()">
+    <div class="ald-ico">✉️</div>
+    <div><div class="ald-txt">E-posta ile Giriş / Kayıt</div><div class="ald-sub">E-posta + şifre</div></div>
+   </div>
+   <div class="ald" onclick="A.guest()">
+    <div class="ald-ico">👤</div>
+    <div><div class="ald-txt">Misafir Olarak Gir</div><div class="ald-sub">Kayıt olmadan oyna</div></div>
+   </div>
+  </div>
+
+  <!-- STEP 1b: E-posta formu -->
+  <div id="as1b" class="astep">
+   <div style="font-size:.76rem;font-weight:700;margin-bottom:10px">✉️ E-posta ile Giriş</div>
+   <div class="aerr" id="a-m2"></div>
    <input class="ai" id="a-em" type="email" placeholder="E-posta">
    <input class="ai" id="a-pw" type="password" placeholder="Şifre (min 6)">
    <button class="abtn ap" id="a-eb" onclick="A.email()">Giriş Yap</button>
-   <div class="adiv">veya</div>
-   <button class="abtn aq" onclick="A.guest()">👤 Misafir Olarak Gir</button>
    <div class="alink" id="a-tg">Hesabın yok mu? <span onclick="A.toggleReg()">Kayıt Ol</span></div>
+   <button class="abtn aq" style="margin-top:4px;font-size:.72rem" onclick="A.backToMain()">← Geri</button>
   </div>
+
+  <!-- STEP 2: Yükleniyor -->
+  <div id="as2" class="astep">
+   <div class="aload">⏳ Giriş yapılıyor...</div>
+  </div>
+
+  <!-- STEP 3: Ad Seç (SADECE yeni kullanıcı) -->
   <div id="as3" class="astep">
+   <div style="font-size:.8rem;font-weight:700;margin-bottom:4px">👋 Hoş geldin!</div>
+   <div style="font-size:.68rem;color:var(--mut);margin-bottom:12px">Bir oyuncu adı seç (isteğe bağlı).</div>
+   <div class="aerr" id="a-n1"></div>
+   <input class="ai" id="a-nm" placeholder="Kullanıcı adı (2–20 karakter)" maxlength="20">
+   <button class="abtn ap" onclick="A.confirmName()">Oyuna Başla 🎲</button>
+   <button class="abtn aq" style="font-size:.7rem" onclick="A.confirmName(true)">Adlandırmadan devam et</button>
+  </div>
+
+  <!-- STEP 4: E-posta doğrulama -->
+  <div id="as4" class="astep">
    <div style="font-size:.78rem;font-weight:700;margin-bottom:8px">📧 E-posta Doğrulama</div>
-   <div class="aok" id="a-vm">Doğrulama maili gönderildi. E-postanı kontrol et, linke tıkla, sonra butona bas.</div>
+   <div class="aok" id="a-vm">Doğrulama maili gönderildi. Linke tıkla, sonra butona bas.</div>
    <div class="aerr" id="a-ve"></div>
    <button class="abtn ap" onclick="A.checkVerify()">✅ Doğruladım</button>
    <button class="abtn aq" onclick="A.resend()">📨 Tekrar Gönder</button>
@@ -503,7 +543,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
  </div>
 </div>
 
-<div class="ver">COINFLIP GALAXY V6 — BLOCK COIN SEASON</div>
+<div class="ver">COINFLIP GALAXY V7 — BLOCK COIN SEASON</div>
 
 <!-- ══ MODALS ══ -->
 <div id="mm" class="mbk" onclick="if(event.target===this)M.close('mm')">
@@ -642,7 +682,7 @@ const T={go(id,el){
   document.querySelectorAll('.tpg').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
   $(id).classList.add('on');el.classList.add('on');
-  if(id==='tn')Ann.load();
+  if(id==='tn')Ann.load(true);
   if(id==='tp'){Pass.renderTrack();Pass.renderQuests();Pass.updHdr();}
   if(id==='tui'){UI.render();UI.renderBanner();}
 }};
@@ -1470,22 +1510,80 @@ const LB={open(){$('lbc').innerHTML='<div style="text-align:center;padding:14px;
 
 /* ══ ANNOUNCEMENTS ══ */
 const Ann={
-  async load(){
-    try{const snap=await db.collection('announcements').orderBy('createdAt','desc').limit(20).get();
-      if(snap.empty){$('annlist').innerHTML='<div style="text-align:center;padding:14px;color:var(--mut)">Henüz duyuru yok.</div>';return;}
-      $('annlist').innerHTML=snap.docs.map(doc=>{const a=doc.data();
-        const dt=a.createdAt?.toDate?new Date(a.createdAt.toDate()).toLocaleDateString('tr-TR'):'';
+  _loaded:false,
+  async load(force=false){
+    const listEl=document.getElementById('annlist');
+    if(!listEl)return;
+    if(!force&&this._loaded)return;
+    listEl.innerHTML='<div style="text-align:center;padding:14px;color:var(--mut)">Yükleniyor...</div>';
+    try{
+      /* createdAt index yoksa önce pinned, sonra tarih sırası */
+      let snap;
+      try{
+        snap=await db.collection('announcements')
+          .orderBy('pinned','desc')
+          .orderBy('createdAt','desc')
+          .limit(30).get();
+      }catch(e2){
+        /* index henüz yoksa sadece limit ile çek */
+        snap=await db.collection('announcements').limit(30).get();
+      }
+      if(snap.empty){
+        listEl.innerHTML='<div style="text-align:center;padding:14px;color:var(--mut)">Henüz duyuru yok.</div>';
+        return;
+      }
+      this._loaded=true;
+      /* Pinned üstte, gerisini tarih sırasına göre sırala */
+      const docs=[...snap.docs].sort((a,b)=>{
+        const ad=a.data(),bd=b.data();
+        if(ad.pinned&&!bd.pinned)return -1;
+        if(!ad.pinned&&bd.pinned)return 1;
+        const at=ad.createdAt?.toMillis?ad.createdAt.toMillis():0;
+        const bt=bd.createdAt?.toMillis?bd.createdAt.toMillis():0;
+        return bt-at;
+      });
+      listEl.innerHTML=docs.map(doc=>{
+        const a=doc.data();
+        const dt=a.createdAt?.toDate?new Date(a.createdAt.toDate()).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'}):'';
         return`<div class="anc ${a.pinned?'pin':''}">
           <div class="anm">${a.pinned?'<span class="anpin">📌 SABİTLENDİ</span>':''}<span class="antit">${a.title||''}</span><span class="andt">${dt}</span></div>
           <div class="anb">${(a.body||'').replace(/\n/g,'<br>')}</div>
         </div>`;
       }).join('');
-    }catch(e){$('annlist').innerHTML='<div style="text-align:center;padding:14px;color:var(--mut)">Yüklenemedi.</div>';}},
-  async send(){if(fba.currentUser?.email!==ADMIN){toast('Yetki yok!','❌');return;}
-    const title=$('at').value.trim(),body=$('ab').value.trim(),pinned=$('apin').checked;
+    }catch(e){
+      console.error('Ann.load error:',e);
+      listEl.innerHTML='<div style="text-align:center;padding:14px;color:var(--mut)">Yüklenemedi. İnternet bağlantını kontrol et.</div>';
+    }
+  },
+  async send(){
+    const user=fba.currentUser;
+    if(!user||user.email!==ADMIN){toast('Yetki yok!','❌');return;}
+    const titleEl=document.getElementById('at'),bodyEl=document.getElementById('ab'),pinEl=document.getElementById('apin');
+    const title=(titleEl?.value||'').trim(),body=(bodyEl?.value||'').trim(),pinned=!!pinEl?.checked;
     if(!title||!body){toast('Başlık ve içerik gerekli!','⚠️');return;}
-    await db.collection('announcements').add({title,body,pinned,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-    toast('Duyuru yayınlandı!','📢');M.close('adm');Ann.load();$('at').value='';$('ab').value='';$('apin').checked=false;}
+    try{
+      await db.collection('announcements').add({
+        title,body,pinned,
+        authorEmail:user.email,
+        createdAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+      toast('Duyuru yayınlandı!','📢');
+      M.close('adm');
+      this._loaded=false;
+      Ann.load(true);
+      if(titleEl)titleEl.value='';
+      if(bodyEl)bodyEl.value='';
+      if(pinEl)pinEl.checked=false;
+    }catch(e){
+      toast('Gönderim hatası: '+e.message,'❌');
+      console.error('Ann.send error:',e);
+    }
+  },
+  async del(id){
+    if(!confirm('Bu duyuruyu sil?'))return;
+    try{await db.collection('announcements').doc(id).delete();this._loaded=false;Ann.load(true);toast('Duyuru silindi.','🗑️');}
+    catch(e){toast('Silinemedi.','❌');}
+  }
 };
 
 /* ══ CONFETTI (RAF only, zero lag) ══ */
@@ -1534,31 +1632,150 @@ function addCR(name='',emoji='❓',color='#7c3aed'){
   c.appendChild(d);}
 
 /* ══ AUTH ══ */
-let _isReg=false,_pUser=null;
+/* ══ AUTH V7 ══
+   Akış: 1) Giriş yöntemi seç → 2) Giriş yap → 3) Yeni kullanıcıysa ad seç → Oyun
+   Eski kullanıcılar displayName varsa ad adımını atlar.
+*/
+let _isReg=false,_pUser=null,_pendingUser=null;
 const A={
-  _name:'',
-  step1(){const n=$('a-nm').value.trim();
-    if(n.length<2){$('a-n1').style.display='block';$('a-n1').textContent='En az 2 karakter.';return;}
-    this._name=n;$('as1').classList.remove('on');$('as2').classList.add('on');},
-  toggleReg(){_isReg=!_isReg;
-    $('a-eb').textContent=_isReg?'Kayıt Ol':'Giriş Yap';
-    $('a-tg').innerHTML=_isReg?'Hesabın var mı? <span onclick="A.toggleReg()">Giriş Yap</span>':'Hesabın yok mu? <span onclick="A.toggleReg()">Kayıt Ol</span>';},
-  async google(){try{const r=await fba.signInWithPopup(new firebase.auth.GoogleAuthProvider());await this._fin(r.user,this._name||r.user.displayName||'Oyuncu');}
-    catch(e){this._err('a-m1',this._em(e));}},
-  async email(){const em=$('a-em').value.trim(),pw=$('a-pw').value;
-    if(!em||!pw||pw.length<6){this._err('a-m1','E-posta ve şifre (min 6) gerekli.');return;}
-    try{if(_isReg){const r=await fba.createUserWithEmailAndPassword(em,pw);await r.user.sendEmailVerification();_pUser=r.user;$('as2').classList.remove('on');$('as3').classList.add('on');}
-      else{const r=await fba.signInWithEmailAndPassword(em,pw);if(!r.user.emailVerified){_pUser=r.user;$('as2').classList.remove('on');$('as3').classList.add('on');return;}
-        await this._fin(r.user,this._name||r.user.displayName||'Oyuncu');}}
-    catch(e){this._err('a-m1',this._em(e));}},
-  async checkVerify(){if(!_pUser)return;await _pUser.reload();
-    if(_pUser.emailVerified)await this._fin(_pUser,this._name||_pUser.displayName||'Oyuncu');
-    else this._err('a-ve','Henüz doğrulanmamış. E-postanı kontrol et.');},
-  async resend(){if(_pUser){await _pUser.sendEmailVerification();$('a-vm').textContent='Tekrar gönderildi!';}},
-  async guest(){try{const r=await fba.signInAnonymously();await this._fin(r.user,this._name||'Misafir',true);}
-    catch(e){this._err('a-m1',this._em(e));}},
+  _step(id){
+    ['as1','as1b','as2','as3','as4'].forEach(s=>{
+      const el=document.getElementById(s);
+      if(el)el.classList.toggle('on',el.id===id);
+    });
+  },
+  _err(id,msg){const el=document.getElementById(id);if(el){el.style.display='block';el.textContent=msg;}},
+  _clearErr(){['a-m1','a-m2','a-n1','a-ve'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});},
+  _em(e){const m={
+    'auth/user-not-found':'Kullanıcı bulunamadı.',
+    'auth/wrong-password':'Yanlış şifre.',
+    'auth/invalid-credential':'Yanlış e-posta veya şifre.',
+    'auth/email-already-in-use':'E-posta zaten kayıtlı.',
+    'auth/invalid-email':'Geçersiz e-posta.',
+    'auth/network-request-failed':'Bağlantı hatası.',
+    'auth/too-many-requests':'Çok fazla deneme. Bekle.',
+    'auth/popup-closed-by-user':'Popup kapatıldı.',
+    'auth/cancelled-popup-request':'Popup iptal edildi.',
+    'auth/popup-blocked':'Popup engellendi. Tarayıcı izinlerini kontrol et.'
+  };return m[e.code]||e.message||'Hata oluştu.';},
+
+  showEmail(){this._clearErr();this._step('as1b');},
+  backToMain(){this._clearErr();this._step('as1');},
+
+  toggleReg(){
+    _isReg=!_isReg;
+    const btn=document.getElementById('a-eb');
+    if(btn)btn.textContent=_isReg?'Kayıt Ol':'Giriş Yap';
+    const tg=document.getElementById('a-tg');
+    if(tg)tg.innerHTML=_isReg
+      ?'Hesabın var mı? <span onclick="A.toggleReg()">Giriş Yap</span>'
+      :'Hesabın yok mu? <span onclick="A.toggleReg()">Kayıt Ol</span>';
+  },
+
+  async google(){
+    this._clearErr();
+    this._step('as2');
+    try{
+      const prov=new firebase.auth.GoogleAuthProvider();
+      const r=await fba.signInWithPopup(prov);
+      await this._afterLogin(r.user);
+    }catch(e){
+      this._step('as1');
+      this._err('a-m1',this._em(e));
+    }
+  },
+
+  async email(){
+    this._clearErr();
+    const em=(document.getElementById('a-em')||{}).value?.trim();
+    const pw=(document.getElementById('a-pw')||{}).value;
+    if(!em||!pw||pw.length<6){this._err('a-m2','E-posta ve şifre (min 6 karakter) gerekli.');return;}
+    this._step('as2');
+    try{
+      if(_isReg){
+        const r=await fba.createUserWithEmailAndPassword(em,pw);
+        await r.user.sendEmailVerification();
+        _pUser=r.user;
+        this._step('as4');
+      }else{
+        const r=await fba.signInWithEmailAndPassword(em,pw);
+        if(!r.user.emailVerified){
+          _pUser=r.user;
+          this._step('as4');
+          return;
+        }
+        await this._afterLogin(r.user);
+      }
+    }catch(e){
+      this._step('as1b');
+      this._err('a-m2',this._em(e));
+    }
+  },
+
+  async guest(){
+    this._clearErr();
+    this._step('as2');
+    try{
+      const r=await fba.signInAnonymously();
+      await this._afterLogin(r.user);
+    }catch(e){
+      this._step('as1');
+      this._err('a-m1',this._em(e));
+    }
+  },
+
+  async checkVerify(){
+    if(!_pUser)return;
+    try{
+      await _pUser.reload();
+      if(_pUser.emailVerified){
+        this._step('as2');
+        await this._afterLogin(_pUser);
+      }else{
+        this._err('a-ve','Henüz doğrulanmamış. E-postanı kontrol et.');
+      }
+    }catch(e){this._err('a-ve',this._em(e));}
+  },
+
+  async resend(){
+    if(_pUser){
+      try{await _pUser.sendEmailVerification();const el=document.getElementById('a-vm');if(el)el.textContent='Tekrar gönderildi!';}
+      catch(e){}
+    }
+  },
+
+  /* Giriş başarılı → kullanıcı yeni mi kontrol et */
+  async _afterLogin(user){
+    _pendingUser=user;
+    await Cloud.load(user.uid);
+    /* Yeni kullanıcı: displayName yok VE Firestore'da kayıt yok */
+    const isNew=!user.displayName&&!(S.ls?.flips>0);
+    if(isNew){
+      this._step('as3');
+    }else{
+      await this._fin(user,user.displayName||S.displayName||'Oyuncu');
+    }
+  },
+
+  /* Ad onay adımı */
+  async confirmName(skip=false){
+    const user=_pendingUser;if(!user)return;
+    let name='Oyuncu';
+    if(!skip){
+      const nm=(document.getElementById('a-nm')||{}).value?.trim();
+      if(nm&&nm.length<2){this._err('a-n1','En az 2 karakter gerekli.');return;}
+      if(nm)name=nm;
+      else name=user.displayName||'Oyuncu';
+    }else{
+      name=user.displayName||'Misafir';
+    }
+    this._step('as2');
+    await this._fin(user,name);
+  },
+
+  /* Son adım: oyunu başlat */
   async _fin(user,name){
-    try{await user.updateProfile({displayName:name});}catch(e){}
+    try{if(name&&name!==user.displayName)await user.updateProfile({displayName:name});}catch(e){}
     await Cloud.load(user.uid);
     S.ls.sessions=(S.ls.sessions||0)+1;
     const h=new Date().getHours();
@@ -1567,27 +1784,53 @@ const A={
     if(!S.inv||!S.inv.length)S.inv=['s0'];
     if(!S.skin)S.skin='s0';
     if(!S.uiOwned)S.uiOwned=[];
+    if(!S.bc)S.bc=0;
     initQ();
     if(!S.outs||!S.outs.length)G.setMode(S.mode||'NORMAL');
-    else{$('mpill').textContent=MNAMES[S.mode]||S.mode;$('stit').textContent='📊 '+MNAMES[S.mode];}
+    else{const mp=document.getElementById('mpill');const st=document.getElementById('stit');
+      if(mp)mp.textContent=MNAMES[S.mode]||S.mode;if(st)st.textContent='📊 '+(MNAMES[S.mode]||S.mode);}
     applySkin(S.skin);UI.restoreOnLoad();rStats();rHdr();rAch();updLbar();Pass.updHdr();
-    if(S.autoOn){$('asel').innerHTML=['10 Kez','50 Kez','100 Kez','500 Kez','1.000','5.000','Sınırsız']
-      .map((t,i)=>`<option value="${[10,50,100,500,1000,5000,999999][i]}">${t}</option>`).join('');
-      $('asel').disabled=false;$('bauto').disabled=false;$('ahint').style.display='none';}
-    else $('ahint').style.display='block';
-    if(user.email===ADMIN){const b=document.createElement('button');b.className='btn bs';
+    if(S.autoOn){
+      const asel=document.getElementById('asel');
+      if(asel){asel.innerHTML=['10 Kez','50 Kez','100 Kez','500 Kez','1.000','5.000','Sınırsız']
+        .map((t,i)=>`<option value="${[10,50,100,500,1000,5000,999999][i]}">${t}</option>`).join('');
+        asel.disabled=false;}
+      const bauto=document.getElementById('bauto');if(bauto)bauto.disabled=false;
+      const ahint=document.getElementById('ahint');if(ahint)ahint.style.display='none';
+    }else{const ahint=document.getElementById('ahint');if(ahint)ahint.style.display='block';}
+    /* Admin butonu */
+    if(user.email===ADMIN&&!document.getElementById('admbtn')){
+      const b=document.createElement('button');b.id='admbtn';b.className='btn bs';
       b.style.cssText='position:fixed;bottom:8px;right:8px;z-index:999;padding:5px 9px;font-size:.65rem;border-radius:7px;';
-      b.textContent='📢 Duyuru';b.onclick=()=>M.open('adm');document.body.appendChild(b);}
-    $('auth').style.display='none';$('app').style.display='flex';
-    G.chkAchs();Cloud.save();},
-  async logout(){if(!confirm('Çıkış yap?'))return;Cloud.save();await fba.signOut();location.reload();},
-  _err(id,msg){$(id).style.display='block';$(id).textContent=msg;},
-  _em(e){const m={'auth/user-not-found':'Kullanıcı bulunamadı.','auth/wrong-password':'Yanlış şifre.',
-    'auth/email-already-in-use':'E-posta zaten kayıtlı.','auth/invalid-email':'Geçersiz e-posta.',
-    'auth/network-request-failed':'Bağlantı hatası.','auth/too-many-requests':'Çok fazla deneme.',
-    'auth/popup-closed-by-user':'Popup kapatıldı.'};return m[e.code]||e.message||'Hata oluştu.';}
+      b.textContent='📢 Duyuru';b.onclick=()=>M.open('adm');document.body.appendChild(b);
+    }
+    const auth=document.getElementById('auth');if(auth)auth.style.display='none';
+    const app=document.getElementById('app');if(app)app.style.display='flex';
+    G.chkAchs();Cloud.save();
+  },
+
+  async logout(){
+    if(!confirm('Çıkış yap?'))return;
+    Cloud.save();await fba.signOut();location.reload();
+  }
 };
 
+/* onAuthStateChanged — otomatik giriş (önceden giriş yapmışsa) */
+fba.onAuthStateChanged(async u=>{
+  if(!u){
+    const auth=document.getElementById('auth');
+    if(auth)auth.style.display='flex';
+    return;
+  }
+  /* Önceden giriş yapmış kullanıcı — direkt _fin'e git, ad sormadan */
+  const authDiv=document.getElementById('auth');
+  if(authDiv&&authDiv.style.display!=='none'){
+    const as2=document.getElementById('as2');
+    if(as2){as2.classList.add('on');['as1','as1b','as3','as4'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('on');});}
+    _pendingUser=u;
+    await A._fin(u,u.displayName||'Oyuncu');
+  }
+});
 /* ══════════════════════════════════════════════════
    UI MARKET — 100 Arayüz Teması
    Her tema: CSS değişkenlerini + arkaplan efektini değiştirir
@@ -2369,8 +2612,7 @@ const UI={
   }
 };
 
-/* ══ ENTRY POINT ══ */
-fba.onAuthStateChanged(u=>{if(!u){$('auth').style.display='flex';}});
+/* ══ ENTRY POINT — auth handled above in A object ══ */
 </script>
 </body>
 </html>
