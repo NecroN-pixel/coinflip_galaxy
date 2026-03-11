@@ -648,16 +648,337 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 </div>
 
 <!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInAnonymously,
+         signInWithEmailAndPassword, createUserWithEmailAndPassword,
+         sendEmailVerification, onAuthStateChanged, signOut, updateProfile }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs,
+         query, orderBy, limit, serverTimestamp, deleteDoc }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAvFRR-2ValHMmTvWxsQWUrxGZfAyd922I",
+  authDomain: "coinflip-galaxy.firebaseapp.com",
+  projectId: "coinflip-galaxy",
+  storageBucket: "coinflip-galaxy.firebasestorage.app",
+  messagingSenderId: "23729209386",
+  appId: "1:23729209386:web:39b84d24775bb37cdbc353",
+  measurementId: "G-H76F0H29PE"
+};
+
+const _app = initializeApp(firebaseConfig);
+const _auth = getAuth(_app);
+const _db = getFirestore(_app);
+_auth.languageCode = "tr";
+
+const ADMIN = "necron.offical@gmail.com";
+
+/* ── Cloud (Firestore) ── */
+const Cloud = {
+  _deb: null,
+  save() {
+    clearTimeout(this._deb);
+    this._deb = setTimeout(async () => {
+      const u = _auth.currentUser; if (!u) return;
+      try {
+        const d = { ...S, displayName: u.displayName || "Oyuncu",
+          totalFlips: S.ls.flips || 0, bestStreak: S.bestStr || 0,
+          achCount: S.achs.length, currency: S.cur,
+          lastSeen: serverTimestamp() };
+        await setDoc(doc(_db, "users", u.uid), d, { merge: true });
+      } catch (e) { console.warn("Save error:", e.code || e.message); }
+    }, 3500);
+  },
+  async load(uid) {
+    try {
+      const snap = await getDoc(doc(_db, "users", uid));
+      if (snap.exists()) {
+        const d = snap.data();
+        S = { ...S, ...d, ls: { ...S.ls, ...(d.ls || {}) } };
+      }
+    } catch (e) { console.warn("Load error:", e.code || e.message); }
+  }
+};
+window.Cloud = Cloud;
+
+/* ── Announcements (Ann) ── */
+const Ann = {
+  _loaded: false,
+  async load(force) {
+    const listEl = document.getElementById("annlist"); if (!listEl) return;
+    if (!force && this._loaded) return;
+    listEl.innerHTML = "<div style=\"text-align:center;padding:14px;color:#64748b\">Yükleniyor...</div>";
+    try {
+      let snap;
+      try {
+        snap = await getDocs(query(collection(_db, "announcements"), orderBy("pinned", "desc"), orderBy("createdAt", "desc"), limit(30)));
+      } catch (_) {
+        snap = await getDocs(query(collection(_db, "announcements"), limit(30)));
+      }
+      if (snap.empty) { listEl.innerHTML = "<div style=\"text-align:center;padding:14px;color:#64748b\">Henüz duyuru yok.</div>"; return; }
+      this._loaded = true;
+      const docs = [...snap.docs].sort((a, b) => {
+        const ad = a.data(), bd = b.data();
+        if (ad.pinned && !bd.pinned) return -1;
+        if (!ad.pinned && bd.pinned) return 1;
+        return (bd.createdAt?.toMillis?.() || 0) - (ad.createdAt?.toMillis?.() || 0);
+      });
+      listEl.innerHTML = docs.map(d => {
+        const a = d.data();
+        const dt = a.createdAt?.toDate ? new Date(a.createdAt.toDate()).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }) : "";
+        return `<div class="anc ${a.pinned ? "pin" : ""}">
+          <div class="anm">${a.pinned ? "<span class=\"anpin\">📌 SABİTLENDİ</span>" : ""}<span class="antit">${a.title || ""}</span><span class="andt">${dt}</span></div>
+          <div class="anb">${(a.body || "").replace(/\n/g, "<br>")}</div>
+        </div>`;
+      }).join("");
+    } catch (e) { listEl.innerHTML = "<div style=\"text-align:center;padding:14px;color:#64748b\">Yüklenemedi.</div>"; }
+  },
+  async send() {
+    const u = _auth.currentUser;
+    if (!u || u.email !== ADMIN) { toast("Yetki yok!", "❌"); return; }
+    const title = (document.getElementById("at")?.value || "").trim();
+    const body  = (document.getElementById("ab")?.value || "").trim();
+    const pinned = !!document.getElementById("apin")?.checked;
+    if (!title || !body) { toast("Başlık ve içerik gerekli!", "⚠️"); return; }
+    try {
+      await addDoc(collection(_db, "announcements"), { title, body, pinned, authorEmail: u.email, createdAt: serverTimestamp() });
+      toast("Duyuru yayınlandı!", "📢");
+      M.close("adm"); this._loaded = false; Ann.load(true);
+      ["at","ab"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
+      const pin = document.getElementById("apin"); if (pin) pin.checked = false;
+    } catch (e) { toast("Gönderim hatası: " + e.message, "❌"); }
+  }
+};
+window.Ann = Ann;
+
+/* ── AUTH ── */
+let _pUser = null, _pendingUser = null, _isReg = false;
+
+function authStep(id) {
+  ["as1","as1b","as2","as3","as4"].forEach(s => {
+    const el = document.getElementById(s);
+    if (!el) return;
+    el.style.display = (s === id) ? "block" : "none";
+  });
+}
+function authErr(eid, msg) {
+  const el = document.getElementById(eid);
+  if (el) { el.textContent = msg; el.style.display = "block"; }
+}
+function clearErr() {
+  ["a-m1","a-m2","a-n1","a-ve"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style.display = "none"; el.textContent = ""; }
+  });
+}
+function authEm(e) {
+  const m = {
+    "auth/user-not-found": "Kullanıcı bulunamadı.",
+    "auth/wrong-password": "Yanlış şifre.",
+    "auth/invalid-credential": "Yanlış e-posta veya şifre.",
+    "auth/email-already-in-use": "Bu e-posta zaten kayıtlı.",
+    "auth/invalid-email": "Geçersiz e-posta.",
+    "auth/network-request-failed": "Bağlantı hatası.",
+    "auth/too-many-requests": "Çok fazla deneme. Bekle.",
+    "auth/popup-closed-by-user": "Popup kapatıldı.",
+    "auth/popup-blocked": "Popup engellendi. Tarayıcı izin ver."
+  };
+  return m[e.code] || e.message || "Bir hata oluştu.";
+}
+
+async function afterLogin(user) {
+  _pendingUser = user;
+  await Cloud.load(user.uid);
+  const isNew = !user.displayName && !(S.ls?.flips > 0);
+  if (isNew) { authStep("as3"); }
+  else { await finLogin(user, user.displayName || S.displayName || "Oyuncu"); }
+}
+
+async function finLogin(user, name) {
+  try { if (name && name !== user.displayName) await updateProfile(user, { displayName: name }); } catch (_) {}
+  await Cloud.load(user.uid);
+  S.ls.sessions = (S.ls.sessions || 0) + 1;
+  const h = new Date().getHours();
+  if (h === 0 || h === 1) S.ls.midnight = true;
+  if (h < 6) S.ls.earlyBird = true;
+  if (!S.inv?.length) S.inv = ["s0"];
+  if (!S.skin) S.skin = "s0";
+  if (!S.uiOwned) S.uiOwned = [];
+  if (!S.bc) S.bc = 0;
+  initQ();
+  if (!S.outs?.length) G.setMode(S.mode || "NORMAL");
+  else {
+    const mp = document.getElementById("mpill"), st = document.getElementById("stit");
+    if (mp) mp.textContent = MNAMES[S.mode] || S.mode;
+    if (st) st.textContent = "📊 " + (MNAMES[S.mode] || S.mode);
+  }
+  applySkin(S.skin); UI.restoreOnLoad(); rStats(); rHdr(); rAch(); updLbar(); Pass.updHdr();
+  if (S.autoOn) {
+    const asel = document.getElementById("asel"), bauto = document.getElementById("bauto"), ahint = document.getElementById("ahint");
+    if (asel) {
+      asel.innerHTML = ["10 Kez","50 Kez","100 Kez","500 Kez","1.000","5.000","Sınırsız"]
+        .map((t,i) => `<option value="${[10,50,100,500,1000,5000,999999][i]}">${t}</option>`).join("");
+      asel.disabled = false;
+    }
+    if (bauto) bauto.disabled = false;
+    if (ahint) ahint.style.display = "none";
+  } else {
+    const ahint = document.getElementById("ahint"); if (ahint) ahint.style.display = "block";
+  }
+  if (user.email === ADMIN && !document.getElementById("admbtn")) {
+    const b = document.createElement("button"); b.id = "admbtn"; b.className = "btn bs";
+    b.style.cssText = "position:fixed;bottom:8px;right:8px;z-index:999;padding:5px 9px;font-size:.65rem;border-radius:7px;";
+    b.textContent = "📢 Duyuru"; b.onclick = () => M.open("adm");
+    document.body.appendChild(b);
+  }
+  const authDiv = document.getElementById("auth"); if (authDiv) authDiv.style.display = "none";
+  const appDiv  = document.getElementById("app");  if (appDiv)  appDiv.style.display  = "flex";
+  G.chkAchs(); Cloud.save();
+}
+
+/* Buton event listener'ları */
+function bindAuth() {
+  const g = id => document.getElementById(id);
+
+  g("btn-google")?.addEventListener("click", async () => {
+    clearErr(); authStep("as2");
+    try { const r = await signInWithPopup(_auth, new GoogleAuthProvider()); await afterLogin(r.user); }
+    catch (e) { authStep("as1"); authErr("a-m1", authEm(e)); }
+  });
+
+  g("btn-email")?.addEventListener("click", () => { clearErr(); authStep("as1b"); });
+
+  g("btn-guest")?.addEventListener("click", async () => {
+    clearErr(); authStep("as2");
+    try { const r = await signInAnonymously(_auth); await afterLogin(r.user); }
+    catch (e) { authStep("as1"); authErr("a-m1", authEm(e)); }
+  });
+
+  g("btn-back")?.addEventListener("click", () => { clearErr(); authStep("as1"); });
+
+  g("a-eb")?.addEventListener("click", async () => {
+    clearErr();
+    const em = (g("a-em")?.value || "").trim();
+    const pw = g("a-pw")?.value || "";
+    if (!em || !pw || pw.length < 6) { authErr("a-m2", "E-posta ve min 6 karakterli şifre gerekli."); return; }
+    authStep("as2");
+    try {
+      if (_isReg) {
+        const r = await createUserWithEmailAndPassword(_auth, em, pw);
+        await sendEmailVerification(r.user); _pUser = r.user; authStep("as4");
+      } else {
+        const r = await signInWithEmailAndPassword(_auth, em, pw);
+        if (!r.user.emailVerified) { _pUser = r.user; authStep("as4"); return; }
+        await afterLogin(r.user);
+      }
+    } catch (e) { authStep("as1b"); authErr("a-m2", authEm(e)); }
+  });
+
+  g("a-tg-span")?.addEventListener("click", () => {
+    _isReg = !_isReg;
+    const btn = g("a-eb"); if (btn) btn.textContent = _isReg ? "Kayıt Ol" : "Giriş Yap";
+    const sp = g("a-tg-span"); if (sp) sp.textContent = _isReg ? "Giriş Yap" : "Kayıt Ol";
+    const tg = g("a-tg"); if (tg && tg.childNodes[0]) tg.childNodes[0].textContent = _isReg ? "Hesabın var mı? " : "Hesabın yok mu? ";
+  });
+
+  g("btn-confirm")?.addEventListener("click", async () => {
+    const user = _pendingUser; if (!user) return;
+    const nm = (g("a-nm")?.value || "").trim();
+    if (nm && nm.length < 2) { authErr("a-n1", "En az 2 karakter."); return; }
+    authStep("as2"); await finLogin(user, nm || user.displayName || "Oyuncu");
+  });
+
+  g("btn-skip")?.addEventListener("click", async () => {
+    const user = _pendingUser; if (!user) return;
+    authStep("as2"); await finLogin(user, user.displayName || "Misafir");
+  });
+
+  g("btn-verify")?.addEventListener("click", async () => {
+    if (!_pUser) return;
+    try {
+      await _pUser.reload();
+      if (_pUser.emailVerified) { authStep("as2"); await afterLogin(_pUser); }
+      else authErr("a-ve", "Henüz doğrulanmamış. E-postanı kontrol et.");
+    } catch (e) { authErr("a-ve", authEm(e)); }
+  });
+
+  g("btn-resend")?.addEventListener("click", async () => {
+    if (_pUser) try { await sendEmailVerification(_pUser); const vm = g("a-vm"); if (vm) vm.textContent = "Tekrar gönderildi!"; } catch (_) {}
+  });
+}
+
+/* onAuthStateChanged */
+onAuthStateChanged(_auth, async user => {
+  const appDiv = document.getElementById("app");
+  if (appDiv?.style.display === "flex") return; // zaten içeride
+  if (!user) {
+    const authDiv = document.getElementById("auth");
+    if (authDiv) authDiv.style.display = "flex";
+    authStep("as1");
+    bindAuth(); // butonları bağla
+    return;
+  }
+  // Önceki oturum var → direkt giriş
+  authStep("as2");
+  _pendingUser = user;
+  await finLogin(user, user.displayName || "Oyuncu");
+});
+
+/* Globals: diğer script bloğu bunlara erişecek */
+window.ADMIN  = ADMIN;
+window._auth  = _auth;
+window._db    = _db;
+window.signOut_firebase = () => signOut(_auth);
+window._fs_collection  = collection;
+window._fs_query       = query;
+window._fs_orderBy     = orderBy;
+window._fs_limit       = limit;
+window._fs_getDocs     = getDocs;
+window._fs_addDoc      = addDoc;
+window._fs_deleteDoc   = deleteDoc;
+window._fs_doc         = doc;
+window._fs_getDoc      = getDoc;
+window._fs_setDoc      = setDoc;
+window.serverTimestamp_firebase = serverTimestamp;
+window.Ann    = Ann;
+window.Cloud  = Cloud;
+window.A      = { logout: async () => { if (!confirm("Çıkış yap?")) return; Cloud.save(); await signOut(_auth); location.reload(); } };
+
+</script>
 <script>
 'use strict';
-/* ══ FIREBASE ══ */
-firebase.initializeApp({apiKey:"AIzaSyAvFRR-2ValHMmTvWxsQWUrxGZfAyd922I",authDomain:"coinflip-galaxy.firebaseapp.com",projectId:"coinflip-galaxy",appId:"1:23729209386:web:39b84d24775bb37cdbc353"});
-const fba=firebase.auth(),db=firebase.firestore();
-fba.languageCode='tr';
-const ADMIN='necron.offical@gmail.com';
+/* ══ GLOBALS ── Firebase modular SDK window'a bağlandı üstte ══ */
+
+/* Compat shims - modular SDK'yı eski sözdizimi gibi kullanmak için */
+const fba = {
+  get currentUser(){ return window._auth?.currentUser || null; },
+  signOut(){ return window.signOut_firebase(); }
+};
+
+/* Firestore compat wrapper */
+const db = {
+  collection(name){
+    const collection=window._fs_collection, query=window._fs_query,
+      orderBy=window._fs_orderBy, limit=window._fs_limit,
+      getDocs=window._fs_getDocs, addDoc=window._fs_addDoc,
+      deleteDoc=window._fs_deleteDoc, doc=window._fs_doc;
+    return {
+      _name: name,
+      orderBy(field, dir){ this._order = [field, dir||'asc']; return this; },
+      limit(n){ this._lim = n; return this; },
+      async get(){
+        const col = collection(window._db, name);
+        const constraints = [];
+        if(this._order) constraints.push(orderBy(...this._order));
+        if(this._lim)  constraints.push(limit(this._lim));
+        return getDocs(constraints.length ? query(col, ...constraints) : col);
+      },
+      doc(id){ return { async delete(){ return deleteDoc(doc(window._db, name, id)); } }; }
+    };
+  }
+};
 
 /* ══ UTILS ══ */
 const $=id=>document.getElementById(id);
@@ -1057,22 +1378,7 @@ let S={
 };
 
 /* ══ CLOUD ══ */
-const Cloud={
-  save:deb(async()=>{
-    const u=fba.currentUser;if(!u)return;
-    try{const d={...S,displayName:u.displayName||'Oyuncu',totalFlips:S.ls.flips||0,
-      bestStreak:S.bestStr||0,achCount:S.achs.length,currency:S.cur,
-      lastSeen:firebase.firestore.FieldValue.serverTimestamp()};
-      await db.collection('users').doc(u.uid).set(d,{merge:true});}
-    catch(e){console.warn('Save error:',e.code);}
-  },3500),
-  async load(uid){
-    try{const snap=await db.collection('users').doc(uid).get();
-      if(snap.exists){const d=snap.data();S={...S,...d,ls:{...S.ls,...(d.ls||{})}};}
-    }catch(e){console.warn('Load error:',e.code);}
-  }
-};
-
+/* Cloud — modular script'ta tanımlandı, window.Cloud üzerinden erişilir */
 /* ══ LUCKY CALC ══ */
 function getLucky(){return Math.min(80,5+(S.lLv||1)*4+(S.passLuck||0));}
 function updLbar(){const p=getLucky();$('lbf').style.width=p+'%';$('lpct').textContent=p+'%';}
@@ -1497,83 +1803,7 @@ const LB={open(){$('lbc').innerHTML='<div style="text-align:center;padding:14px;
 };
 
 /* ══ ANNOUNCEMENTS ══ */
-const Ann={
-  _loaded:false,
-  async load(force=false){
-    const listEl=document.getElementById('annlist');
-    if(!listEl)return;
-    if(!force&&this._loaded)return;
-    listEl.innerHTML='<div style="text-align:center;padding:14px;color:var(--mut)">Yükleniyor...</div>';
-    try{
-      /* createdAt index yoksa önce pinned, sonra tarih sırası */
-      let snap;
-      try{
-        snap=await db.collection('announcements')
-          .orderBy('pinned','desc')
-          .orderBy('createdAt','desc')
-          .limit(30).get();
-      }catch(e2){
-        /* index henüz yoksa sadece limit ile çek */
-        snap=await db.collection('announcements').limit(30).get();
-      }
-      if(snap.empty){
-        listEl.innerHTML='<div style="text-align:center;padding:14px;color:var(--mut)">Henüz duyuru yok.</div>';
-        return;
-      }
-      this._loaded=true;
-      /* Pinned üstte, gerisini tarih sırasına göre sırala */
-      const docs=[...snap.docs].sort((a,b)=>{
-        const ad=a.data(),bd=b.data();
-        if(ad.pinned&&!bd.pinned)return -1;
-        if(!ad.pinned&&bd.pinned)return 1;
-        const at=ad.createdAt?.toMillis?ad.createdAt.toMillis():0;
-        const bt=bd.createdAt?.toMillis?bd.createdAt.toMillis():0;
-        return bt-at;
-      });
-      listEl.innerHTML=docs.map(doc=>{
-        const a=doc.data();
-        const dt=a.createdAt?.toDate?new Date(a.createdAt.toDate()).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'}):'';
-        return`<div class="anc ${a.pinned?'pin':''}">
-          <div class="anm">${a.pinned?'<span class="anpin">📌 SABİTLENDİ</span>':''}<span class="antit">${a.title||''}</span><span class="andt">${dt}</span></div>
-          <div class="anb">${(a.body||'').replace(/\n/g,'<br>')}</div>
-        </div>`;
-      }).join('');
-    }catch(e){
-      console.error('Ann.load error:',e);
-      listEl.innerHTML='<div style="text-align:center;padding:14px;color:var(--mut)">Yüklenemedi. İnternet bağlantını kontrol et.</div>';
-    }
-  },
-  async send(){
-    const user=fba.currentUser;
-    if(!user||user.email!==ADMIN){toast('Yetki yok!','❌');return;}
-    const titleEl=document.getElementById('at'),bodyEl=document.getElementById('ab'),pinEl=document.getElementById('apin');
-    const title=(titleEl?.value||'').trim(),body=(bodyEl?.value||'').trim(),pinned=!!pinEl?.checked;
-    if(!title||!body){toast('Başlık ve içerik gerekli!','⚠️');return;}
-    try{
-      await db.collection('announcements').add({
-        title,body,pinned,
-        authorEmail:user.email,
-        createdAt:firebase.firestore.FieldValue.serverTimestamp()
-      });
-      toast('Duyuru yayınlandı!','📢');
-      M.close('adm');
-      this._loaded=false;
-      Ann.load(true);
-      if(titleEl)titleEl.value='';
-      if(bodyEl)bodyEl.value='';
-      if(pinEl)pinEl.checked=false;
-    }catch(e){
-      toast('Gönderim hatası: '+e.message,'❌');
-      console.error('Ann.send error:',e);
-    }
-  },
-  async del(id){
-    if(!confirm('Bu duyuruyu sil?'))return;
-    try{await db.collection('announcements').doc(id).delete();this._loaded=false;Ann.load(true);toast('Duyuru silindi.','🗑️');}
-    catch(e){toast('Silinemedi.','❌');}
-  }
-};
-
+/* Ann — modular script'ta tanımlandı, window.Ann üzerinden erişilir */
 /* ══ CONFETTI (RAF only, zero lag) ══ */
 function confetti(n=55){
   const cv=$('cv');cv.width=innerWidth;cv.height=innerHeight;
@@ -1620,239 +1850,7 @@ function addCR(name='',emoji='❓',color='#7c3aed'){
   c.appendChild(d);}
 
 /* ══ AUTH ══ */
-/* ══ AUTH V7 — temiz, onclick-free, event listener tabanlı ══ */
-let _isReg=false,_pUser=null,_pendingUser=null,_authReady=false;
-
-function authStep(id){
-  ['as1','as1b','as2','as3','as4'].forEach(function(s){
-    var el=document.getElementById(s);
-    if(!el)return;
-    if(s===id){el.style.display='block';}
-    else{el.style.display='none';}
-  });
-}
-
-function authErr(id,msg){
-  var el=document.getElementById(id);
-  if(el){el.textContent=msg;el.style.display='block';}
-}
-
-function authClearErr(){
-  ['a-m1','a-m2','a-n1','a-ve'].forEach(function(id){
-    var el=document.getElementById(id);
-    if(el){el.style.display='none';el.textContent='';}
-  });
-}
-
-function authEm(e){
-  var m={
-    'auth/user-not-found':'Kullanıcı bulunamadı.',
-    'auth/wrong-password':'Yanlış şifre.',
-    'auth/invalid-credential':'Yanlış e-posta veya şifre.',
-    'auth/email-already-in-use':'Bu e-posta zaten kayıtlı.',
-    'auth/invalid-email':'Geçersiz e-posta adresi.',
-    'auth/network-request-failed':'Bağlantı hatası.',
-    'auth/too-many-requests':'Çok fazla deneme. Biraz bekle.',
-    'auth/popup-closed-by-user':'Popup kapatıldı.',
-    'auth/cancelled-popup-request':'Popup iptal edildi.',
-    'auth/popup-blocked':'Popup engellendi. Tarayıcı izinlerini kontrol et.'
-  };
-  return m[e.code]||e.message||'Bir hata oluştu.';
-}
-
-async function authAfterLogin(user){
-  _pendingUser=user;
-  authStep('as2');
-  await Cloud.load(user.uid);
-  var isNew=!user.displayName&&!(S.ls&&S.ls.flips>0);
-  if(isNew){
-    authStep('as3');
-  }else{
-    await authFin(user,user.displayName||S.displayName||'Oyuncu');
-  }
-}
-
-async function authFin(user,name){
-  try{if(name&&name!==user.displayName)await user.updateProfile({displayName:name});}catch(e){}
-  await Cloud.load(user.uid);
-  S.ls.sessions=(S.ls.sessions||0)+1;
-  var h=new Date().getHours();
-  if(h===0||h===1)S.ls.midnight=true;
-  if(h<6)S.ls.earlyBird=true;
-  if(!S.inv||!S.inv.length)S.inv=['s0'];
-  if(!S.skin)S.skin='s0';
-  if(!S.uiOwned)S.uiOwned=[];
-  if(!S.bc)S.bc=0;
-  initQ();
-  if(!S.outs||!S.outs.length)G.setMode(S.mode||'NORMAL');
-  else{
-    var mp=document.getElementById('mpill'),st=document.getElementById('stit');
-    if(mp)mp.textContent=MNAMES[S.mode]||S.mode;
-    if(st)st.textContent='📊 '+(MNAMES[S.mode]||S.mode);
-  }
-  applySkin(S.skin);UI.restoreOnLoad();rStats();rHdr();rAch();updLbar();Pass.updHdr();
-  if(S.autoOn){
-    var asel=document.getElementById('asel'),bauto=document.getElementById('bauto'),ahint=document.getElementById('ahint');
-    if(asel){
-      asel.innerHTML=['10 Kez','50 Kez','100 Kez','500 Kez','1.000','5.000','Sınırsız']
-        .map(function(t,i){return'<option value="'+[10,50,100,500,1000,5000,999999][i]+'">'+t+'</option>';}).join('');
-      asel.disabled=false;
-    }
-    if(bauto)bauto.disabled=false;
-    if(ahint)ahint.style.display='none';
-  }else{
-    var ahint=document.getElementById('ahint');if(ahint)ahint.style.display='block';
-  }
-  if(user.email===ADMIN&&!document.getElementById('admbtn')){
-    var b=document.createElement('button');b.id='admbtn';b.className='btn bs';
-    b.style.cssText='position:fixed;bottom:8px;right:8px;z-index:999;padding:5px 9px;font-size:.65rem;border-radius:7px;';
-    b.textContent='📢 Duyuru';b.onclick=function(){M.open('adm');};
-    document.body.appendChild(b);
-  }
-  var authDiv=document.getElementById('auth');if(authDiv)authDiv.style.display='none';
-  var appDiv=document.getElementById('app');if(appDiv)appDiv.style.display='flex';
-  G.chkAchs();Cloud.save();
-}
-
-/* Event listener'ları DOM yüklendikten sonra bağla */
-document.addEventListener('DOMContentLoaded',function(){
-  /* Adım 1 — giriş yöntemi */
-  var btnGoogle=document.getElementById('btn-google');
-  if(btnGoogle)btnGoogle.addEventListener('click',async function(){
-    authClearErr();
-    authStep('as2');
-    try{
-      var r=await fba.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-      await authAfterLogin(r.user);
-    }catch(e){
-      authStep('as1');
-      authErr('a-m1',authEm(e));
-    }
-  });
-
-  var btnEmail=document.getElementById('btn-email');
-  if(btnEmail)btnEmail.addEventListener('click',function(){
-    authClearErr();
-    authStep('as1b');
-  });
-
-  var btnGuest=document.getElementById('btn-guest');
-  if(btnGuest)btnGuest.addEventListener('click',async function(){
-    authClearErr();
-    authStep('as2');
-    try{
-      var r=await fba.signInAnonymously();
-      await authAfterLogin(r.user);
-    }catch(e){
-      authStep('as1');
-      authErr('a-m1',authEm(e));
-    }
-  });
-
-  /* Adım 1b — e-posta formu */
-  var btnBack=document.getElementById('btn-back');
-  if(btnBack)btnBack.addEventListener('click',function(){
-    authClearErr();authStep('as1');
-  });
-
-  var btnEb=document.getElementById('a-eb');
-  if(btnEb)btnEb.addEventListener('click',async function(){
-    authClearErr();
-    var em=(document.getElementById('a-em')||{}).value||'';
-    var pw=(document.getElementById('a-pw')||{}).value||'';
-    em=em.trim();
-    if(!em||!pw||pw.length<6){authErr('a-m2','E-posta ve en az 6 karakterli şifre gerekli.');return;}
-    authStep('as2');
-    try{
-      if(_isReg){
-        var r=await fba.createUserWithEmailAndPassword(em,pw);
-        await r.user.sendEmailVerification();
-        _pUser=r.user;authStep('as4');
-      }else{
-        var r=await fba.signInWithEmailAndPassword(em,pw);
-        if(!r.user.emailVerified){_pUser=r.user;authStep('as4');return;}
-        await authAfterLogin(r.user);
-      }
-    }catch(e){
-      authStep('as1b');
-      authErr('a-m2',authEm(e));
-    }
-  });
-
-  var tgSpan=document.getElementById('a-tg-span');
-  if(tgSpan)tgSpan.addEventListener('click',function(){
-    _isReg=!_isReg;
-    var btn=document.getElementById('a-eb');
-    if(btn)btn.textContent=_isReg?'Kayıt Ol':'Giriş Yap';
-    if(tgSpan)tgSpan.textContent=_isReg?'Giriş Yap':'Kayıt Ol';
-    var tg=document.getElementById('a-tg');
-    if(tg)tg.firstChild.textContent=_isReg?'Hesabın var mı? ':'Hesabın yok mu? ';
-  });
-
-  /* Adım 3 — ad seç */
-  var btnConfirm=document.getElementById('btn-confirm');
-  if(btnConfirm)btnConfirm.addEventListener('click',async function(){
-    var user=_pendingUser;if(!user)return;
-    var nm=(document.getElementById('a-nm')||{}).value||'';nm=nm.trim();
-    if(nm&&nm.length<2){authErr('a-n1','En az 2 karakter gerekli.');return;}
-    authStep('as2');
-    await authFin(user,nm||user.displayName||'Oyuncu');
-  });
-
-  var btnSkip=document.getElementById('btn-skip');
-  if(btnSkip)btnSkip.addEventListener('click',async function(){
-    var user=_pendingUser;if(!user)return;
-    authStep('as2');
-    await authFin(user,user.displayName||'Misafir');
-  });
-
-  /* Adım 4 — e-posta doğrulama */
-  var btnVerify=document.getElementById('btn-verify');
-  if(btnVerify)btnVerify.addEventListener('click',async function(){
-    if(!_pUser)return;
-    try{
-      await _pUser.reload();
-      if(_pUser.emailVerified){authStep('as2');await authAfterLogin(_pUser);}
-      else{authErr('a-ve','Henüz doğrulanmamış. E-postanı kontrol et.');}
-    }catch(e){authErr('a-ve',authEm(e));}
-  });
-
-  var btnResend=document.getElementById('btn-resend');
-  if(btnResend)btnResend.addEventListener('click',async function(){
-    if(_pUser){
-      try{await _pUser.sendEmailVerification();var vm=document.getElementById('a-vm');if(vm)vm.textContent='Tekrar gönderildi!';}
-      catch(e){}
-    }
-  });
-});
-
-/* onAuthStateChanged — önceden giriş yapmış kullanıcıyı otomatik al */
-fba.onAuthStateChanged(async function(u){
-  if(!u){
-    /* Kullanıcı yok — auth ekranını göster */
-    var authDiv=document.getElementById('auth');
-    if(authDiv)authDiv.style.display='flex';
-    authStep('as1');
-    return;
-  }
-  /* Kullanıcı var — app zaten açıksa tekrar tetikleme */
-  var appDiv=document.getElementById('app');
-  if(appDiv&&appDiv.style.display==='flex')return;
-  /* Önceki oturum devam ediyor — direkt gir */
-  var authDiv=document.getElementById('auth');
-  if(authDiv){authStep('as2');}
-  _pendingUser=u;
-  await authFin(u,u.displayName||'Oyuncu');
-});
-
-/* Legacy A objesi — diğer kodlar hâlâ A.logout() kullanıyor */
-const A={
-  logout:async function(){
-    if(!confirm('Çıkış yap?'))return;
-    Cloud.save();await fba.signOut();location.reload();
-  }
-};
-/* ══════════════════════════════════════════════════
+/* Auth — modular script'ta tanımlandı *//* ══════════════════════════════════════════════════
    UI MARKET — 100 Arayüz Teması
    Her tema: CSS değişkenlerini + arkaplan efektini değiştirir
    Satın alma: Jeton (💰) veya Block Coin (🧱)
